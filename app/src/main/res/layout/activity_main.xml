@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none"
+    tools:context=".presentation.activity.MainActivity">
+
+    <LinearLayout
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/drawable_secondary_wallpaper1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            tools:ignore="RtlSymmetry">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="55dp"
+                android:layout_marginStart="40dp"
+                android:text="To Do's"
+                android:textColor="@color/black"
+                android:textSize="25sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_date"
+                android:text="Day, 00 Month 0000"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-5dp"
+                android:layout_marginEnd="40dp"
+                android:layout_weight="1"
+                android:paddingTop="50dp"
+                android:textAlignment="textEnd"
+                android:textColor="#5F5F5F"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:id="@+id/horizontalScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:id="@+id/ll_cards_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="25dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="40dp">
+
+                <include
+                    android:id="@+id/cv_ongoing"
+                    layout="@layout/card_status_ongoing" />
+
+                <include
+                    android:id="@+id/cv_onhold"
+                    layout="@layout/card_status_onhold" />
+
+                <include
+                    android:id="@+id/cv_pending"
+                    layout="@layout/card_status_pending" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/popup_menu"
+        android:layout_width="match_parent"
+        android:layout_height="600dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/drawable_secondary_wallpaper2"
+        android:orientation="vertical"
+        android:elevation="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" >
+
+        <TextView
+            android:id="@+id/tv_greetings"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:paddingTop="40dp"
+            android:layout_marginStart="40dp"
+            android:text="Good ___!"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="64dp"
+        android:clickable="true"
+        android:elevation="10dp"
+        android:contentDescription="Add Task"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="@color/black"
+        app:backgroundTint="@color/light_gray_pri"
+        app:rippleColor="@color/dark_gray"
+        app:srcCompat="@drawable/baseline_add_24" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

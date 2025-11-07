@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="light_gray_pri">#C2C2C2</color>
+    <color name="green_pri">#B8CDA5</color>   <!-- softened olive green, balanced brightness -->
+    <color name="yellow_pri">#E2D38E</color>  <!-- gentle golden yellow, warm but not harsh -->
+    <color name="red_pri">#DFA5A5</color>     <!-- mellow brick rose, warm and cohesive -->
+    <color name="light_gray_sec">#E6E6E6</color>
+    <color name="green_sec">#E5EBE0</color>   <!-- very light olive tint, calm and airy -->
+    <color name="yellow_sec">#F0EBD9</color>  <!-- light warm beige, natural and balanced -->
+    <color name="red_sec">#F1E3E3</color>     <!-- soft rose-gray, gentle and neutral -->
+    <color name="dark_gray">#757575</color>
+</resources>

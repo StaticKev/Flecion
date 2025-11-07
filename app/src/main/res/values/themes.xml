@@ -1,0 +1,20 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Lumina" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your theme here -->
+
+        <!-- Enable elevation overlays and shadows -->
+        <item name="android:elevation">4dp</item>
+        <item name="android:translationZ">4dp</item>
+        <item name="android:stateListAnimator">@null</item>
+
+        <!-- Optional: prevent clipping of shadows -->
+        <item name="android:clipChildren">false</item>
+        <item name="android:clipToPadding">false</item>
+
+        <!-- Add this if you want all Material components (like buttons) to have proper elevation -->
+        <item name="materialButtonStyle">@style/Widget.Material3.Button</item>
+    </style>
+
+    <style name="Theme.Lumina" parent="Base.Theme.Lumina" />
+</resources>
