@@ -19,13 +19,14 @@ abstract class AppDatabase : RoomDatabase() {
         private var INSTANCE: AppDatabase? = null
 
         fun getInstance(context: Context): AppDatabase {
+            context.deleteDatabase("app_database") // TODO: Delete on production
+
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                )
-                    .build()
+                ).build()
                 INSTANCE = instance
                 instance
             }

@@ -2,7 +2,6 @@ package com.statickev.lumina.data
 
 import androidx.room.TypeConverter
 import com.statickev.lumina.data.model.DueStatus
-import com.statickev.lumina.data.model.FocusPeriod
 import com.statickev.lumina.data.model.TaskStatus
 import java.time.Instant
 import java.time.LocalDate
@@ -26,19 +25,13 @@ class Converters {
 
     @TypeConverter
     fun fromLocalDate(date: LocalDate?): String? {
-        return date?.toString() // e.g. "2025-11-05"
+        return date?.toString()
     }
 
     @TypeConverter
     fun toLocalDate(dateString: String?): LocalDate? {
         return dateString?.let { LocalDate.parse(it) }
     }
-
-    @TypeConverter
-    fun fromFocusPeriod(value: FocusPeriod): String = value.name
-
-    @TypeConverter
-    fun toFocusPeriod(value: String): FocusPeriod = enumValueOf(value)
 
     @TypeConverter
     fun fromDueStatus(value: DueStatus): String = value.name

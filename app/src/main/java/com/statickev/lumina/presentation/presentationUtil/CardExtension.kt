@@ -1,4 +1,4 @@
-package com.statickev.lumina.presentation.utility
+package com.statickev.lumina.presentation.presentationUtil
 
 import androidx.core.content.ContextCompat
 import com.statickev.lumina.R
@@ -7,8 +7,8 @@ import com.statickev.lumina.databinding.CardStatusOngoingBinding
 import com.statickev.lumina.databinding.CardStatusOnholdBinding
 import com.statickev.lumina.databinding.CardStatusPendingBinding
 
-private val shiftDistance = 40f
-private val shiftDuration: Long = 150
+private const val shiftDistance = 40f
+private const val shiftDuration: Long = 150
 
 fun CardStatusPendingBinding.highlight(
     mainActivityBinding: ActivityMainBinding,
@@ -29,15 +29,11 @@ fun CardStatusPendingBinding.highlight(
 
     cvStatus.setCardBackgroundColor(ContextCompat.getColor(
         cvStatus.context,
-        R.color.red_pri
-    ))
-    mainActivityBinding.root.setBackgroundColor(ContextCompat.getColor(
-        mainActivityBinding.root.context,
-        R.color.red_sec
+        R.color.md_theme_primaryContainer
     ))
     mainActivityBinding.fabAdd.backgroundTintList = ContextCompat.getColorStateList(
         mainActivityBinding.root.context,
-        R.color.red_pri
+        R.color.md_theme_primary
     )
 }
 
@@ -59,7 +55,7 @@ fun CardStatusPendingBinding.unhighlight(
 
     cvStatus.setCardBackgroundColor(ContextCompat.getColor(
         cvStatus.context,
-        R.color.light_gray_pri
+        R.color.md_theme_outlineVariant
     ))
 }
 
@@ -82,15 +78,11 @@ fun CardStatusOnholdBinding.highlight(
 
     cvStatus.setCardBackgroundColor(ContextCompat.getColor(
         cvStatus.context,
-        R.color.yellow_pri
-    ))
-    mainActivityBinding.root.setBackgroundColor(ContextCompat.getColor(
-        mainActivityBinding.root.context,
-        R.color.yellow_sec
+        R.color.md_theme_primaryContainer
     ))
     mainActivityBinding.fabAdd.backgroundTintList = ContextCompat.getColorStateList(
         mainActivityBinding.root.context,
-        R.color.yellow_pri
+        R.color.md_theme_primary
     )
 }
 
@@ -112,7 +104,7 @@ fun CardStatusOnholdBinding.unhighlight(
 
     cvStatus.setCardBackgroundColor(ContextCompat.getColor(
         cvStatus.context,
-        R.color.light_gray_pri
+        R.color.md_theme_outlineVariant
     ))
 }
 
@@ -135,15 +127,11 @@ fun CardStatusOngoingBinding.highlight(
 
     cvStatus.setCardBackgroundColor(ContextCompat.getColor(
         cvStatus.context,
-        R.color.green_pri
-    ))
-    mainActivityBinding.root.setBackgroundColor(ContextCompat.getColor(
-        mainActivityBinding.root.context,
-        R.color.green_sec
+        R.color.md_theme_primaryContainer
     ))
     mainActivityBinding.fabAdd.backgroundTintList = ContextCompat.getColorStateList(
         mainActivityBinding.root.context,
-        R.color.green_pri
+        R.color.md_theme_primary
     )
 }
 
@@ -165,6 +153,6 @@ fun CardStatusOngoingBinding.unhighlight(
 
     cvStatus.setCardBackgroundColor(ContextCompat.getColor(
         cvStatus.context,
-        R.color.light_gray_pri
+        R.color.md_theme_outlineVariant
     ))
 }

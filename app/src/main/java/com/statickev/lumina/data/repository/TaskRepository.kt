@@ -1,15 +1,26 @@
-package com.statickev.lumina.data
+package com.statickev.lumina.data.repository
 
 import com.statickev.lumina.data.dao.TaskDAO
 import com.statickev.lumina.data.model.Task
 import kotlinx.coroutines.flow.Flow
 
-class AppRepository (
+class TaskRepository (
     private val taskDao: TaskDAO
 ) {
 
     // TODO: Modify 'getAllTasks()' function to return sorted data based on 'priorityScore'
     fun getAllTasks(): Flow<List<Task>> = taskDao.getAllTasks()
+
+    fun getPendingTasks(): Flow<List<Task>> = taskDao.getPendingTasks()
+
+    fun getOnHoldTasks(): Flow<List<Task>> = taskDao.getOnHoldTasks()
+
+    fun getOngoingTasks(): Flow<List<Task>> = taskDao.getOngoingTasks()
+
+    // TODO: Delete on production.
+    suspend fun insertTasks(tasks: List<Task>) {
+        taskDao.insertTasks(tasks)
+    }
 
     suspend fun insertTask(task: Task) {
         taskDao.insertTask(task)

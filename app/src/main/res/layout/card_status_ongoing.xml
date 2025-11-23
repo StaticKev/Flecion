@@ -8,12 +8,12 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_status"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp"
         android:clickable="true"
         android:foreground="?attr/selectableItemBackgroundBorderless"
-        app:cardBackgroundColor="#7FD97F"
-        app:cardCornerRadius="10dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        app:cardBackgroundColor="@color/md_theme_primaryContainer"
+        app:cardCornerRadius="@dimen/card_corner_radius"
         app:cardElevation="3dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -34,9 +34,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="3dp"
                 android:text="Ongoing (0)"
-                android:textColor="#000000"
                 android:textSize="15sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:ignore="HardcodedText" />
 
             <TextView
                 android:id="@+id/tv_timeToComplete"
@@ -44,8 +44,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:text="Total time: -"
-                android:textColor="#5F5F5F"
-                android:textSize="10sp" />
+                android:textColor="@color/md_theme_tertiary"
+                android:textSize="10sp"
+                tools:ignore="HardcodedText,SmallSp" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -1,6 +1,6 @@
 package com.statickev.lumina.di
 
-import com.statickev.lumina.data.AppRepository
+import com.statickev.lumina.data.repository.TaskRepository
 import com.statickev.lumina.data.dao.TaskDAO
 import dagger.Module
 import dagger.Provides
@@ -14,8 +14,8 @@ class RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideAppRepository(taskDao: TaskDAO): AppRepository {
-        return AppRepository(taskDao)
+    fun provideAppRepository(taskDao: TaskDAO): TaskRepository {
+        return TaskRepository(taskDao)
     }
 
 }
