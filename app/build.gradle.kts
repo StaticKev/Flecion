@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.statickev.lumina"
+    namespace = "com.statickev.flecion"
     compileSdk {
         version = release(36)
     }
@@ -17,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.statickev.lumina"
+        applicationId = "com.statickev.flecion"
         minSdk = 29
         targetSdk = 36
         versionCode = 1

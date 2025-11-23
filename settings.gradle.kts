@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Lumina"
+rootProject.name = "Flecion"
 include(":app")
