@@ -5,14 +5,16 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.activity.NewTaskActivity">
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context=".presentation.activity.TaskDetailActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:elevation="8dp"
         android:background="@drawable/drawable_secondary_wallpaper1"
+        android:elevation="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -32,7 +34,7 @@
             tools:ignore="ContentDescription" />
 
         <ImageButton
-            android:id="@+id/btn_info"
+            android:id="@+id/btn_delete"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="50dp"
@@ -42,44 +44,30 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_info_24"
+            app:srcCompat="@drawable/baseline_delete_24"
             tools:ignore="ContentDescription" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:elevation="8dp"
-        android:background="@drawable/drawable_secondary_wallpaper2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <Button
-            android:id="@+id/btn_add_task"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="28dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="28dp"
-            android:layout_marginBottom="60dp"
-            android:text="Add"
+        <ImageButton
+            android:id="@+id/btn_undo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="10dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_delete"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="HardcodedText" />
+            app:srcCompat="@drawable/baseline_undo_24"
+            tools:ignore="ContentDescription" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scrollbars="none"
-        android:overScrollMode="never"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
@@ -87,97 +75,21 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
             android:paddingTop="28dp"
-            android:paddingBottom="28dp"
-            android:paddingHorizontal="10dp">
+            android:paddingBottom="64dp">
 
-            <EditText
-                android:id="@+id/et_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autofillHints=""
-                android:background="@android:color/transparent"
-                android:ems="10"
-                android:gravity="start|top"
-                android:hint="Title"
-                android:inputType="textMultiLine"
-                android:textSize="26sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView2"
-                tools:ignore="HardcodedText" />
 
             <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:text="Time to Complete"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.083"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/editText"
-                tools:ignore="HardcodedText" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/cLayout"
+                android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.375"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_hours"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:paddingEnd="5dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="1.0"
-                    app:layout_constraintWidth_percent="0.5"
-                    tools:ignore="RtlSymmetry">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etHours"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:elevation="-4dp"
-                        android:hint="Hours"
-                        android:inputType="numberSigned"
-                        tools:ignore="HardcodedText" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/til_minutes"
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="5dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/til_hours"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_percent="0.5"
-                    tools:ignore="RtlSymmetry">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_minutes"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:elevation="-4dp"
-                        android:hint="Minutes"
-                        android:inputType="numberSigned"
-                        tools:ignore="HardcodedText" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                android:text="Title"
+                android:textSize="26sp"
+                tools:ignore="HardcodedText" />
 
             <TextView
                 android:id="@+id/textView2"
@@ -196,6 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView2"
@@ -239,17 +152,112 @@
                     tools:ignore="HardcodedText" />
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/tg_status_pending_hidden"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/rdb_ongoing_pending_hidden"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="-4dp"
+                    android:text="Ongoing"
+                    app:cornerRadius="5dp"
+                    app:iconGravity="textStart"
+                    tools:ignore="HardcodedText" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/rdb_on_hold_pending_hidden"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="-4dp"
+                    android:text="On Hold"
+                    app:cornerRadius="5dp"
+                    app:iconGravity="textStart"
+                    tools:ignore="HardcodedText" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/textView6"
-                    android:layout_width="100dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="6dp"
+                    android:text="Completion Rate"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/tv_completion_rate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:textAlignment="textEnd"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/sd_completion_rate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stepSize="1"
+                android:value="1"
+                android:valueFrom="0"
+                android:valueTo="100"
+                app:thumbHeight="20dp"
+                app:thumbWidth="20dp"
+                app:tickColor="@color/md_theme_secondaryContainer"
+                app:tickVisible="false"
+                app:trackHeight="5dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Time to Complete"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/tv_time_to_complete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="00h 00m"
+                    android:textAlignment="textEnd"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="Priority Level"
                     tools:ignore="HardcodedText" />
 
@@ -257,33 +265,17 @@
                     android:id="@+id/tv_priority_level"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="6dp"
-                    android:textAlignment="textEnd"
                     android:text="1"
+                    android:textAlignment="textEnd"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
-
-            <com.google.android.material.slider.Slider
-                android:id="@+id/sd_priority_level"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:stepSize="1"
-                android:value="1"
-                android:valueFrom="1"
-                android:valueTo="5"
-                app:thumbHeight="20dp"
-                app:thumbWidth="20dp"
-                app:tickColor="@color/md_theme_secondaryContainer"
-                app:tickVisible="false"
-                app:trackHeight="5dp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_remind_at"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 app:startIconDrawable="@drawable/baseline_notifications_none_24"
                 tools:ignore="HardcodedText,RtlSymmetry">
 
@@ -355,7 +347,8 @@
                     android:textColorHint="@color/md_theme_tertiary"
                     tools:ignore="HardcodedText" />
             </com.google.android.material.textfield.TextInputLayout>
-
         </LinearLayout>
+
     </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

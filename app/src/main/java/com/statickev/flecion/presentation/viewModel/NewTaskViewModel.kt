@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.statickev.flecion.data.model.Task
 import com.statickev.flecion.data.model.TaskStatus
 import com.statickev.flecion.data.repository.TaskRepository
+import com.statickev.flecion.presentation.presentationUtil.doAtIsValid
+import com.statickev.flecion.presentation.presentationUtil.remindAtIsValid
 import com.statickev.flecion.util.getDateTimeFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -17,16 +19,10 @@ import javax.inject.Inject
 class NewTaskViewModel @Inject constructor (
     private val taskRepo: TaskRepository
 ) : ViewModel() {
-    private val _title = MutableLiveData("New Task")
-    private val _description = MutableLiveData("")
+    private val _newTask = Task()
+
     private val _timeToCompleteHours = MutableLiveData(0)
     private val _timeToCompleteMins = MutableLiveData(0)
-    private val _taskStatus = MutableLiveData(TaskStatus.PENDING)
-    private val _priorityLevel = MutableLiveData<Byte>(1)
-    private val _remindAt = MutableLiveData<LocalDateTime?>(null)
-    private val _due = MutableLiveData<LocalDateTime?>(null)
-    private val _doAt = MutableLiveData<LocalDateTime?>(null)
-    private val _addToCalendar = MutableLiveData(false)
 
     private val _timeToCompleteHoursError = MutableLiveData<String?>(null)
     val timeToCompleteHoursError: LiveData<String?> = _timeToCompleteHoursError
@@ -42,12 +38,13 @@ class NewTaskViewModel @Inject constructor (
     val onTaskAdded: LiveData<Boolean> = _onTaskAdded
 
     fun onTitleChanged(value: String) {
-        if (value.isBlank() || value.isEmpty()) _title.value = "New Task"
-        else _title.value = value
+        _newTask.title =
+            if (value.isEmpty() || value.isBlank()) "New Task"
+            else value
     }
 
     fun onDescriptionChanged(value: String) {
-        _description.value = value
+        _newTask.description = value
     }
 
     fun onTimeToCompleteHoursChanged(value: String) {
@@ -55,13 +52,20 @@ class NewTaskViewModel @Inject constructor (
             _timeToCompleteHours.value = value.toInt()
             _timeToCompleteHours.value?.let {
                 if (it > 7200) _timeToCompleteHoursError.value = "Hours too large"
-                else _timeToCompleteHoursError.value = null
+                else {
+                    _timeToCompleteHoursError.value = null
+
+                    _newTask.timeToCompleteMins =
+                        (_timeToCompleteHours.value ?: 0) * 60 +
+                                (_timeToCompleteMins.value ?: 0)
+                }
             }
         }
         else {
             _timeToCompleteHours.value = null
             _timeToCompleteHoursError.value = "Required"
         }
+
         validate()
     }
 
@@ -69,100 +73,83 @@ class NewTaskViewModel @Inject constructor (
         if (value.isNotEmpty()) {
             _timeToCompleteMins.value = value.toInt()
             _timeToCompleteMinsError.value = null
+
+            _newTask.timeToCompleteMins =
+                (_timeToCompleteHours.value ?: 0) * 60 +
+                        (_timeToCompleteMins.value ?: 0)
         }
         else {
             _timeToCompleteMins.value = null
             _timeToCompleteMinsError.value = "Required"
         }
+
         validate()
     }
 
-    fun onTaskStatusChanged(value: TaskStatus) {
-        _taskStatus.value = value
+    fun onStatusChanged(value: TaskStatus) {
+        _newTask.status = value
     }
 
     fun onPriorityLevelChanged(value: Float) {
-        _priorityLevel.value = value.toInt().toByte()
+        _newTask.priorityLevel = value.toInt().toByte()
     }
 
     fun onRemindAtChanged(value: String?) {
-        _remindAt.value = value?.takeIf { it.isNotEmpty() }?.let {
+        _newTask.remindAt = value?.takeIf { it.isNotEmpty() }?.let {
             LocalDateTime.parse(it, getDateTimeFormatter())
         }
 
-        validateRemindAt()
+        _remindAtError.value = _newTask.remindAt?.let {
+            remindAtIsValid(it, _newTask.due, _newTask.doAt)
+        }
+
         validate()
     }
 
     fun onDueChanged(value: String?) {
-        _due.value = value?.takeIf { it.isNotEmpty() }?.let {
+        _newTask.due = value?.takeIf { it.isNotEmpty() }?.let {
             LocalDateTime.parse(it, getDateTimeFormatter())
         }
 
-        validateRemindAt()
-        validateDoAt()
+        _remindAtError.value = _newTask.remindAt?.let {
+            remindAtIsValid(it, _newTask.due, _newTask.doAt)
+        }
+        _doAtError.value = _newTask.doAt?.let {
+            doAtIsValid(_newTask.due, it)
+        }
+
         validate()
     }
 
     fun onDoAtChanged(value: String?) {
-        _doAt.value = value?.takeIf { it.isNotEmpty() }?.let {
+        _newTask.doAt = value?.takeIf { it.isNotEmpty() }?.let {
             LocalDateTime.parse(it, getDateTimeFormatter())
         }
 
-        validateRemindAt()
-        validateDoAt()
+        _remindAtError.value = _newTask.remindAt?.let {
+            remindAtIsValid(it, _newTask.due, _newTask.doAt)
+        }
+        _doAtError.value = _newTask.doAt?.let {
+            doAtIsValid(_newTask.due, it)
+        }
+
         validate()
     }
 
     fun onAddToCalendarChanged(value: Boolean) {
-        _addToCalendar.value = value
+        _newTask.addToCalendar = value
     }
 
     private fun validate() {
         _isFormValid.value = timeToCompleteHoursError.value == null &&
                 timeToCompleteMinsError.value == null &&
-                remindAtError.value == null
-    }
-
-    private fun validateRemindAt() {
-        _remindAtError.value = when {
-            _remindAt.value != null
-                    && _due.value != null
-                    && _remindAt.value?.isAfter(_due.value) == true ->
-                        "This value cannot exceed the due date!"
-            _remindAt.value != null
-                    && _doAt.value != null
-                    && _remindAt.value?.isAfter(_doAt.value) == true ->
-                        "This value cannot exceed the do at date!"
-            else -> null
-        }
-    }
-
-    private fun validateDoAt() {
-        _doAtError.value = when {
-            _due.value != null
-                    && _doAt.value != null
-                    && _doAt.value?.isAfter(_due.value) == true ->
-                        "This value cannot exceed the due date!"
-            else -> null
-        }
+                remindAtError.value == null &&
+                doAtError.value == null
     }
 
     fun addTask() {
-        val newTask = Task(
-            title = _title.value!!,
-            description = _description.value,
-            status = _taskStatus.value!!,
-            priorityLevel = _priorityLevel.value!!,
-            timeToCompleteMins = _timeToCompleteMins.value!! + _timeToCompleteHours.value!! * 60,
-            remindAt = _remindAt.value,
-            due = _due.value,
-            doAt = _doAt.value,
-            addToCalendar = _addToCalendar.value!!
-        )
-
         viewModelScope.launch {
-            taskRepo.insertTask(newTask)
+            taskRepo.insertTask(_newTask)
             _onTaskAdded.postValue(true)
         }
     }

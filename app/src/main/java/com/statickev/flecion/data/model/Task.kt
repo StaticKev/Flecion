@@ -5,46 +5,64 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
+
+// TODO: Add validations for priorityLevel, timeToCompleteMins, completionRate, remindAt, due, doAt
 
 @Entity(tableName = "tasks")
 data class Task(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val title: String = "Title",
-    val description: String?,
-    val status: TaskStatus,
-    val priorityLevel: Byte,
-    val timeToCompleteMins: Int,
-    val progressPercentage: Int = 0,
-    val remindAt: LocalDateTime?,
-    val due: LocalDateTime?,
-    val doAt: LocalDateTime?,
-    val addToCalendar: Boolean
+    var title: String = "New Task",
+    var description: String? = "",
+    var status: TaskStatus = TaskStatus.PENDING,
+    var priorityLevel: Byte = 1,
+    var timeToCompleteMins: Int = 0,
+    var completionRate: Int = 0,
+    var remindAt: LocalDateTime? = null,
+    var due: LocalDateTime? = null,
+    var doAt: LocalDateTime? = null,
+    var addToCalendar: Boolean = false,
+    var googleEventId: String? = null
 ) {
-    @Ignore
-    val actualTimeToCompleteMins: Int = timeToCompleteMins - (
-            timeToCompleteMins * progressPercentage / 100
-            )
-    @Ignore
-    val daysUntilDue: () -> Int = {
-        if (due != null) {
-            ChronoUnit.DAYS.between(
-                LocalDate.now(),
-                due
-            ).toInt()
-        } else 0
-    }
-    @Ignore
-    val isOverdue: DueStatus = when {
-        due?.isEqual(LocalDateTime.now()) == true -> DueStatus.DUE_TODAY
-        due?.isBefore(LocalDateTime.now()) == true -> DueStatus.OVERDUE
-        due?.isAfter(LocalDateTime.now()) == true -> DueStatus.UPCOMING
-        else -> DueStatus.NO_DUE
-    }
-    // TODO: Determine how to recapitulate 'priorityScore'.
-    @Ignore
-    val priorityScore: Int = 0
+    @get:Ignore
+    val timeLeftToComplete: Int
+        get() = timeToCompleteMins - (
+                timeToCompleteMins * completionRate / 100
+                )
+    @get:Ignore
+    val isOverdue: DueStatus
+        get() = when {
+            due == null -> DueStatus.NO_DUE
+            due!!.isEqual(LocalDateTime.now()) -> DueStatus.DUE_TODAY
+            due!!.isBefore(LocalDateTime.now()) -> DueStatus.OVERDUE
+            else -> DueStatus.UPCOMING
+        }
+    @get:Ignore
+    val priorityScore: Int
+        get() {
+            val daysToDue = due?.let {
+                java.time.Duration.between(LocalDateTime.now(), it)
+                    .toDays().coerceAtLeast(0)
+            } ?: 365
+
+            val daysToDoAt = doAt?.let {
+                java.time.Duration.between(LocalDateTime.now(), it)
+                    .toDays().coerceAtLeast(0)
+            } ?: 365
+
+            val normalizedPriorityLevel = priorityLevel / 5.0
+            val normalizedTimeLeft = timeLeftToComplete / 432059.0
+            val normalizedDaysToDue = 1 - (daysToDue / 365.0)
+            val normalizedDaysToDoAt = 1 - (daysToDoAt / 365.0)
+
+            val rawScore =
+                normalizedPriorityLevel * 0.5 +
+                        normalizedTimeLeft * 0.2 +
+                        normalizedDaysToDue * 0.2 +
+                        normalizedDaysToDoAt * 0.1
+
+            return (rawScore * 1000).toInt().coerceAtLeast(1)
+        }
 }
 
 enum class TaskStatus {

@@ -5,8 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/md_theme_background_mediumContrast"
     android:scrollbars="none"
-    android:background="@color/md_theme_background"
     tools:context=".presentation.activity.MainActivity">
 
     <LinearLayout
@@ -94,14 +94,14 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_tasks"
-        android:elevation="0dp"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:elevation="0dp"
         android:overScrollMode="never"
         android:paddingTop="10dp"
-        android:paddingBottom="70dp"
+        android:paddingBottom="135dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -109,19 +109,19 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add"
-        android:clickable="true"
-        android:contentDescription="Add Task"
-        android:elevation="2dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="64dp"
-        android:translationZ="2dp"
         android:backgroundTint="@color/md_theme_primary"
-        app:tint="@color/md_theme_onPrimary"
+        android:clickable="true"
+        android:contentDescription="Add Task"
+        android:elevation="2dp"
+        android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/baseline_add_24"
+        app:tint="@color/md_theme_onPrimary"
         tools:ignore="HardcodedText" />
 
     <LinearLayout

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 class TaskRepository (
     private val taskDao: TaskDAO
 ) {
+    fun getTaskById(id: Int): Flow<Task?> = taskDao.getTaskById(id)
 
     // TODO: Modify 'getAllTasks()' function to return sorted data based on 'priorityScore'
     fun getAllTasks(): Flow<List<Task>> = taskDao.getAllTasks()

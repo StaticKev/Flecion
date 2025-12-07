@@ -26,7 +26,10 @@ interface TaskDAO {
     @Delete
     suspend fun deleteTask(task: Task)
 
-    @Query("SELECT * FROM tasks WHERE progressPercentage != 100")
+    @Query("SELECT * FROM tasks WHERE id = :id")
+    fun getTaskById(id: Int): Flow<Task?>
+
+    @Query("SELECT * FROM tasks WHERE completionRate != 100")
     fun getAllTasks(): Flow<List<Task>>
 
     @Query("SELECT * FROM tasks WHERE status = 'PENDING'")

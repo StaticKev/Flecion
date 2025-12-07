@@ -1,13 +1,11 @@
 package com.statickev.flecion.presentation.activity
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -17,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewbinding.ViewBinding
-import com.google.android.material.snackbar.Snackbar
 import com.statickev.flecion.R
 import com.statickev.flecion.data.model.Task
 import com.statickev.flecion.data.model.TaskStatus
@@ -29,10 +26,12 @@ import com.statickev.flecion.databinding.CardStatusPendingBinding
 import com.statickev.flecion.presentation.adapter.TaskAdapter
 import com.statickev.flecion.presentation.presentationUtil.highlight
 import com.statickev.flecion.presentation.presentationUtil.generalSetup
+import com.statickev.flecion.presentation.presentationUtil.showSnackbar
 import com.statickev.flecion.presentation.presentationUtil.unhighlight
 import com.statickev.flecion.presentation.viewModel.TaskViewModel
 import com.statickev.flecion.util.getDayDateFormatter
 import com.statickev.flecion.util.getGreeting
+import com.statickev.flecion.util.minsToFormattedDuration
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -59,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             if (result.resultCode == RESULT_OK) {
                 val taskCreated = result.data?.getBooleanExtra("taskCreated", false) ?: false
                 if (taskCreated) {
-                    showSnackbar("Task added!")
+                    showSnackbar(binding.root, "Task added!")
                 }
             }
         }
@@ -84,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                         status = TaskStatus.PENDING,
                         priorityLevel = ((i % 3) + 1).toByte(),
                         timeToCompleteMins = (i + 2) * 10,
-                        progressPercentage = 20 * (i % 5),
+                        completionRate = 20 * (i % 5),
                         doAt = LocalDateTime.now().plusHours(i.toLong()),
                         remindAt = LocalDateTime.now().plusHours(i.toLong() + 1),
                         due = LocalDateTime.now().plusDays((i % 5).toLong()),
@@ -101,7 +100,7 @@ class MainActivity : AppCompatActivity() {
                         status = TaskStatus.ON_HOLD,
                         priorityLevel = ((i % 3) + 1).toByte(),
                         timeToCompleteMins = 90 + i * 15,
-                        progressPercentage = 20 * (i % 5),
+                        completionRate = 20 * (i % 5),
                         doAt = LocalDateTime.now().minusDays(i.toLong()),
                         remindAt = LocalDateTime.now().minusDays(i.toLong() - 1),
                         due = LocalDateTime.now().plusDays((i % 7).toLong()),
@@ -118,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                         status = TaskStatus.ONGOING,
                         priorityLevel = ((i % 3) + 1).toByte(),
                         timeToCompleteMins = 120 + i * 20,
-                        progressPercentage = 20 * (i % 5),
+                        completionRate = 20 * (i % 5),
                         doAt = LocalDateTime.now().minusHours(i.toLong() * 2),
                         remindAt = LocalDateTime.now().plusHours((i + 1).toLong()),
                         due = LocalDateTime.now().plusDays((i % 3).toLong()),
@@ -161,22 +160,44 @@ class MainActivity : AppCompatActivity() {
         binding.fabAdd.setOnClickListener {
             val intent = Intent(this, NewTaskActivity::class.java)
             addTaskLauncher.launch(intent)
-
-//            val intent = Intent(this, NewTaskActivity::class.java)
-//            when (tempCardBinding) {
-//                is CardStatusPendingBinding -> intent.putExtra(
-//                    STATUS_KEY, TaskStatus.PENDING.name
-//                )
-//                is CardStatusOnholdBinding -> intent.putExtra(
-//                    STATUS_KEY, TaskStatus.ON_HOLD.name
-//                )
-//                is CardStatusOngoingBinding -> intent.putExtra(
-//                    STATUS_KEY,
-//                    TaskStatus.ONGOING.name
-//                )
-//            }
-//            startActivity(intent)
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    taskViewModel.pendingTaskState.collect {
+                        """Pending (${it.count()})"""
+                            .also { pendingCardBinding.tvTypeCount.text = it }
+
+                        val totalTime = it.sumOf { task -> task.timeLeftToComplete }
+                        """Total time: ${minsToFormattedDuration(totalTime)}"""
+                            .also { pendingCardBinding.tvTimeToComplete.text = it }
+                    }
+                }
+                launch {
+                    taskViewModel.onHoldTaskState.collect {
+                        """On Hold (${it.count()})"""
+                            .also { onHoldCardBinding.tvTypeCount.text = it }
+
+                        val totalTime = it.sumOf { task -> task.timeLeftToComplete }
+                        """Total time: ${minsToFormattedDuration(totalTime)}"""
+                            .also { onHoldCardBinding.tvTimeToComplete.text = it }
+                    }
+                }
+                launch {
+                    taskViewModel.ongoingTaskState.collect {
+                        """Ongoing (${it.count()})"""
+                            .also { ongoingCardBinding.tvTypeCount.text = it }
+
+                        val totalTime = it.sumOf { task -> task.timeLeftToComplete }
+                        """Total time: ${minsToFormattedDuration(totalTime)}"""
+                            .also { ongoingCardBinding.tvTimeToComplete.text = it }
+                    }
+                }
+            }
+        }
+
+//        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binding.rvTasks)
 
         setContentView(binding.root)
     }
@@ -345,19 +366,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // TODO: Move this to a separated file!
-    private fun showSnackbar(message: String) {
-        val snack = Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+//    val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+//        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+//        0 // swipe disabled
+//    ) {
+//        override fun onMove(
+//            recyclerView: RecyclerView,
+//            viewHolder: RecyclerView.ViewHolder,
+//            target: RecyclerView.ViewHolder
+//        ): Boolean {
+//            // TODO: Implement the move action later.
+////            val fromPos = viewHolder.adapterPosition
+////            val toPos = target.adapterPosition
+////
+////            adapter.moveItem(fromPos, toPos)
+//            return true
+//        }
+//
+//        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+//            // not needed since we don’t swipe
+//        }
+//
+//        override fun isLongPressDragEnabled(): Boolean = true
+//    }
 
-        val snackbarView = snack.view
-        snackbarView.setBackgroundResource(R.drawable.drawable_snackbar_container)
-
-        val text = snackbarView.findViewById<TextView>(
-            com.google.android.material.R.id.snackbar_text
-        )
-        text.setTextColor(Color.WHITE)
-        text.textSize = 16f
-
-        snack.show()
-    }
 }

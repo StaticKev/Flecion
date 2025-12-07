@@ -12,9 +12,10 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cv_task"
         android:layout_width="349dp"
-        android:layout_height="100dp"
-        app:cardCornerRadius="@dimen/card_corner_radius"
+        android:layout_height="84dp"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         app:cardBackgroundColor="@color/md_theme_surfaceContainerLowest"
+        app:cardCornerRadius="@dimen/card_corner_radius"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,14 +23,17 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="20dp">
 
             <TextView
                 android:id="@+id/tv_title"
-                android:layout_width="220dp"
+                android:layout_width="240dp"
                 android:layout_height="21dp"
-                android:layout_marginStart="28dp"
-                android:layout_marginTop="26dp"
+                android:ellipsize="end"
+                android:maxLines="@integer/material_motion_duration_short_1"
+                android:singleLine="true"
                 android:text="Title"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -41,15 +45,13 @@
                 android:id="@+id/tv_time_to_complete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="13dp"
-                android:layout_marginEnd="28dp"
-                android:layout_marginBottom="26dp"
-                android:text="00 hours 00 minutes"
+                android:layout_marginBottom="2dp"
+                android:gravity="center_vertical"
+                android:text="00h 00m left"
                 android:textColor="@color/md_theme_tertiary"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_due_date"
                 tools:ignore="HardcodedText,SmallSp" />
 
             <TextView
@@ -57,23 +59,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="13dp"
-                android:layout_marginBottom="26dp"
-                android:text="0%"
+                android:layout_marginBottom="2dp"
+                android:text="100%"
+                android:textAlignment="textStart"
                 android:textColor="@color/md_theme_tertiary"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/pb_progress"
-                app:layout_constraintTop_toBottomOf="@+id/tv_due_date"
-                app:layout_constraintVertical_bias="1.0"
                 tools:ignore="HardcodedText,SmallSp" />
 
             <TextView
                 android:id="@+id/tv_due_date"
                 android:layout_width="wrap_content"
                 android:layout_height="21dp"
-                android:layout_marginTop="26dp"
-                android:layout_marginEnd="28dp"
                 android:gravity="center_vertical"
                 android:text="00/00/0000"
                 android:textColor="@color/md_theme_tertiary"
@@ -87,12 +85,8 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="28dp"
-                android:layout_marginTop="13dp"
-                android:layout_marginBottom="26dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_title" />
+                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

@@ -1,7 +1,9 @@
 package com.statickev.flecion.util
 
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
@@ -14,6 +16,10 @@ fun minsToFormattedDuration(mins: Int): String {
     else String.format(Locale.getDefault(), "%dh %dm", h, m)
 }
 
+fun getFormattedDateTime(dateTime: LocalDateTime): String {
+    return getDateTimeFormatter().format(dateTime)
+}
+
 fun getGreeting(): String {
     val hour = LocalTime.now().hour
     return when (hour) {
@@ -24,7 +30,7 @@ fun getGreeting(): String {
     }
 }
 
-fun getFormattedDateTime(dateMillis: Long, timeMinutes: Int): String {
+fun getConcatenatedDateTime(dateMillis: Long, timeMinutes: Int): String {
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = dateMillis
 
