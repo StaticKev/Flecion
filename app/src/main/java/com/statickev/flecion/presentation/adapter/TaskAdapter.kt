@@ -34,7 +34,6 @@ class TaskAdapter(
         return TaskViewHolder(binding)
     }
 
-    // TODO: Update this to accommodate card modification
     override fun onBindViewHolder(
         holder: TaskViewHolder,
         position: Int
@@ -42,9 +41,14 @@ class TaskAdapter(
         val task = tasks[position]
         with(holder.binding) {
             tvTitle.text = task.title
-            tvTimeToComplete.text = buildString {
-                append(minsToFormattedDuration(task.timeLeftToComplete))
-                append(" left")
+            if (minsToFormattedDuration(task.timeLeftToComplete).isBlank()) {
+                tvTimeToComplete.text = minsToFormattedDuration(task.timeLeftToComplete)
+            }
+            else {
+                tvTimeToComplete.text = buildString {
+                    append(minsToFormattedDuration(task.timeLeftToComplete))
+                    append(" left")
+                }
             }
             tvDueDate.text = task.due?.let { it.toLocalDate().format(getDateFormatter()) } ?: ""
             pbProgress.progress = task.completionRate

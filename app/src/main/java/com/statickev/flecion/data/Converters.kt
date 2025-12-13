@@ -22,20 +22,4 @@ class Converters {
     @TypeConverter
     fun dateToTimestamp(date: LocalDateTime?): Long? =
         date?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
-
-    @TypeConverter
-    fun fromLocalDate(date: LocalDate?): String? {
-        return date?.toString()
-    }
-
-    @TypeConverter
-    fun toLocalDate(dateString: String?): LocalDate? {
-        return dateString?.let { LocalDate.parse(it) }
-    }
-
-    @TypeConverter
-    fun fromDueStatus(value: DueStatus): String = value.name
-
-    @TypeConverter
-    fun toDueStatus(value: String): DueStatus = enumValueOf(value)
 }

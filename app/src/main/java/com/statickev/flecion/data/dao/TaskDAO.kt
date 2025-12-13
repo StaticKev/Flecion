@@ -40,4 +40,7 @@ interface TaskDAO {
 
     @Query("SELECT * FROM tasks WHERE status = 'ONGOING'")
     fun getOngoingTasks(): Flow<List<Task>>
+
+    @Query("SELECT * FROM tasks WHERE completionRate = 80")
+    fun getTaskCPR80(): Flow<List<Task>>
 }

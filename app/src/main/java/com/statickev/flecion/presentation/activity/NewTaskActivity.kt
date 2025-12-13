@@ -48,9 +48,6 @@ class NewTaskActivity : AppCompatActivity() {
 
         binding = ActivityNewTaskBinding.inflate(layoutInflater)
 
-        // TODO: MAKE THE UI STATELESS!
-        // TODO: Use with statement!
-
         with (binding) {
             etHours.setText("0")
             etMinutes.setText("0")
@@ -273,6 +270,11 @@ class NewTaskActivity : AppCompatActivity() {
         viewModel.remindAtError.observe(this) { error ->
             binding.tilRemindAt.error = error
             binding.tilRemindAt.isErrorEnabled = error != null
+        }
+
+        viewModel.dueError.observe(this) { error ->
+            binding.tilDue.error = error
+            binding.tilDue.isErrorEnabled = error != null
         }
 
         viewModel.doAtError.observe(this) { error ->

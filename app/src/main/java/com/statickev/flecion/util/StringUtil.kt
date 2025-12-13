@@ -11,7 +11,8 @@ fun minsToFormattedDuration(mins: Int): String {
     val m: Int = mins % 60
     val h: Int = mins / 60
 
-    return if (h == 0) String.format(Locale.getDefault(), "%dm", m)
+    return if (mins == 0) ""
+    else if (h == 0) String.format(Locale.getDefault(), "%dm", m)
     else if (m == 0) String.format(Locale.getDefault(), "%dh", h)
     else String.format(Locale.getDefault(), "%dh %dm", h, m)
 }

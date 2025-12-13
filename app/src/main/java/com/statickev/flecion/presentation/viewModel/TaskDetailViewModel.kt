@@ -10,14 +10,13 @@ import com.statickev.flecion.data.model.TaskStatus
 import com.statickev.flecion.data.repository.TaskRepository
 import com.statickev.flecion.presentation.adapter.TaskAdapter.Companion.TASK_ID
 import com.statickev.flecion.presentation.presentationUtil.doAtIsValid
+import com.statickev.flecion.presentation.presentationUtil.dueIsValid
 import com.statickev.flecion.presentation.presentationUtil.remindAtIsValid
 import com.statickev.flecion.util.getDateTimeFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -46,6 +45,8 @@ class TaskDetailViewModel @Inject constructor(
     private val _descriptionFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
     private val _remindAtError = MutableLiveData<String?>(null)
     val remindAtError: LiveData<String?> = _remindAtError
+    private val _dueError = MutableLiveData<String?>(null)
+    val dueError: LiveData<String?> = _dueError
     private val _doAtError = MutableLiveData<String?>(null)
     val doAtError: LiveData<String?> = _doAtError
     var isFormValid = true
@@ -89,43 +90,35 @@ class TaskDetailViewModel @Inject constructor(
     fun onRemindAtChanged(value: String?) {
         viewModelScope.launch {
             task.value?.let { it ->
-                repo.updateTask(
-                    it.copy(
-                        remindAt = value?.takeIf { it.isNotEmpty() }?.let {
-                            LocalDateTime.parse(it, getDateTimeFormatter())
-                        }
-                    )
+                val updatedTask = it.copy(
+                    remindAt = value?.takeIf { it.isNotEmpty() }?.let {
+                        LocalDateTime.parse(it, getDateTimeFormatter())
+                    }
                 )
 
-                _remindAtError.value = it.remindAt?.let { it2 ->
-                    remindAtIsValid(it2, it.due, it.doAt)
-                }
+                repo.updateTask(updatedTask)
 
-                validate()
+//                _remindAtError.value = updatedTask.remindAt?.let { updatedTask ->
+//                    remindAtIsValid(updatedTask, it.due, it.doAt)
+//                }
+
+                validate(updatedTask)
             }
         }
     }
 
-
     fun onDueChanged(value: String?) {
         viewModelScope.launch {
             task.value?.let { it ->
-                repo.updateTask(
-                    it.copy(
-                        due = value?.takeIf { it.isNotEmpty() }?.let {
-                            LocalDateTime.parse(it, getDateTimeFormatter())
-                        }
-                    )
+                val updatedTask = it.copy(
+                    due = value?.takeIf { it.isNotEmpty() }?.let {
+                        LocalDateTime.parse(it, getDateTimeFormatter())
+                    }
                 )
 
-                _remindAtError.value = it.remindAt?.let { it2 ->
-                    remindAtIsValid(it2, it.due, it.doAt)
-                }
-                _doAtError.value = it.doAt?.let { it2 ->
-                    doAtIsValid(it.due, it2 )
-                }
+                repo.updateTask(updatedTask)
 
-                validate()
+                validate(updatedTask)
             }
         }
     }
@@ -133,22 +126,15 @@ class TaskDetailViewModel @Inject constructor(
     fun onDoAtChanged(value: String?) {
         viewModelScope.launch {
             task.value?.let { it ->
-                repo.updateTask(
-                    it.copy(
-                        doAt = value?.takeIf { it.isNotEmpty() }?.let {
-                            LocalDateTime.parse(it, getDateTimeFormatter())
-                        }
-                    )
+                val updatedTask = it.copy(
+                    doAt = value?.takeIf { it.isNotEmpty() }?.let {
+                        LocalDateTime.parse(it, getDateTimeFormatter())
+                    }
                 )
 
-                _remindAtError.value = it.remindAt?.let { it2 ->
-                    remindAtIsValid(it2, it.due, it.doAt)
-                }
-                _doAtError.value = it.doAt?.let { it2 ->
-                    doAtIsValid(it.due, it2)
-                }
+                repo.updateTask(updatedTask)
 
-                validate()
+                validate(updatedTask)
             }
         }
     }
@@ -157,24 +143,56 @@ class TaskDetailViewModel @Inject constructor(
         _descriptionFlow.tryEmit(value)
     }
 
-    fun validate() {
-        isFormValid = _remindAtError.value == null && _doAtError.value == null
+    fun validate(updatedTask: Task) {
+        _remindAtError.value = updatedTask.remindAt?.let { ut ->
+            remindAtIsValid(ut, updatedTask.due, updatedTask.doAt)
+        }
+        _dueError.value = updatedTask.due?.let { ut ->
+            dueIsValid(ut)
+        }
+        _doAtError.value = updatedTask.doAt?.let { ut ->
+            doAtIsValid(updatedTask.due, ut )
+        }
+
+        isFormValid = _remindAtError.value == null
+                && _dueError.value == null
+                && _doAtError.value == null
     }
 
     fun revertChanges(partial: Boolean) {
         viewModelScope.launch {
+            var updatedTask: Task?
+
             task.value?.let {
                 if (partial) {
-                    repo.updateTask(
-                        it.copy(
-                            remindAt = initialTask?.remindAt,
-                            due = initialTask?.due,
-                            doAt = initialTask?.doAt
-                        )
+                    val rcRemindAt = when {
+                        remindAtError.value == null -> task.value?.remindAt
+                        else -> initialTask?.remindAt
+                    }
+                    val rcDue = when {
+                        dueError.value == null -> task.value?.due
+                        else -> initialTask?.due
+                    }
+                    val rcDoAt = when {
+                        _doAtError.value == null -> it.due
+                        else -> initialTask?.doAt
+                    }
+
+                    updatedTask = it.copy(
+                        remindAt = rcRemindAt,
+                        due = rcDue,
+                        doAt = rcDoAt
                     )
+
+                    repo.updateTask(updatedTask)
+                    validate(updatedTask)
                 }
                 else {
-                    repo.updateTask(initialTask?.copy() ?: it)
+                    initialTask?.let {
+                        updatedTask = initialTask!!.copy()
+                        repo.updateTask(updatedTask)
+                        validate(updatedTask)
+                    }
                 }
             }
         }

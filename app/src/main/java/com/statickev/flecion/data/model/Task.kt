@@ -6,8 +6,6 @@ import androidx.room.PrimaryKey
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-// TODO: Add validations for priorityLevel, timeToCompleteMins, completionRate, remindAt, due, doAt
-
 @Entity(tableName = "tasks")
 data class Task(
     @PrimaryKey(autoGenerate = true)

@@ -8,6 +8,7 @@ import com.statickev.flecion.data.model.Task
 import com.statickev.flecion.data.model.TaskStatus
 import com.statickev.flecion.data.repository.TaskRepository
 import com.statickev.flecion.presentation.presentationUtil.doAtIsValid
+import com.statickev.flecion.presentation.presentationUtil.dueIsValid
 import com.statickev.flecion.presentation.presentationUtil.remindAtIsValid
 import com.statickev.flecion.util.getDateTimeFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +31,8 @@ class NewTaskViewModel @Inject constructor (
     val timeToCompleteMinsError: LiveData<String?> = _timeToCompleteMinsError
     private val _remindAtError = MutableLiveData<String?>(null)
     val remindAtError: LiveData<String?> = _remindAtError
+    val _dueError = MutableLiveData<String?>(null)
+    val dueError: LiveData<String?> = _dueError
     private val _doAtError = MutableLiveData<String?>(null)
     val doAtError: LiveData<String?> = _doAtError
     private val _isFormValid = MutableLiveData(true)
@@ -114,6 +117,9 @@ class NewTaskViewModel @Inject constructor (
         _remindAtError.value = _newTask.remindAt?.let {
             remindAtIsValid(it, _newTask.due, _newTask.doAt)
         }
+        _dueError.value = _newTask.due?.let {
+            dueIsValid(it)
+        }
         _doAtError.value = _newTask.doAt?.let {
             doAtIsValid(_newTask.due, it)
         }
@@ -144,6 +150,7 @@ class NewTaskViewModel @Inject constructor (
         _isFormValid.value = timeToCompleteHoursError.value == null &&
                 timeToCompleteMinsError.value == null &&
                 remindAtError.value == null &&
+                dueError.value == null &&
                 doAtError.value == null
     }
 

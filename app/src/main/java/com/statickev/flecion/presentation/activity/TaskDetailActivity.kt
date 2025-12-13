@@ -53,7 +53,7 @@ class TaskDetailActivity : AppCompatActivity() {
             else {
                 MaterialAlertDialogBuilder(this@TaskDetailActivity)
                     .setTitle("Invalid Inputs")
-                    .setMessage("Proceeding will keep the previous value for each invalid fields.")
+                    .setMessage("Proceeding will keep the previous value of each invalid fields.")
                     .setPositiveButton("Yes") { _, _ ->
                         viewModel.revertChanges(true)
                         finish()
@@ -70,7 +70,7 @@ class TaskDetailActivity : AppCompatActivity() {
                 else {
                     MaterialAlertDialogBuilder(this@TaskDetailActivity)
                         .setTitle("Invalid Inputs")
-                        .setMessage("Proceeding will keep the previous value for each invalid fields.")
+                        .setMessage("Proceeding will keep the previous value of each invalid fields.")
                         .setPositiveButton("Yes") { _, _ ->
                             viewModel.revertChanges(true)
                             finish()
@@ -213,6 +213,11 @@ class TaskDetailActivity : AppCompatActivity() {
         viewModel.remindAtError.observe(this) { error ->
             binding.tilRemindAt.error = error
             binding.tilRemindAt.isErrorEnabled = error != null
+        }
+
+        viewModel.dueError.observe(this) { error ->
+            binding.tilDue.error = error
+            binding.tilDue.isErrorEnabled = error != null
         }
 
         viewModel.doAtError.observe(this) { error ->
