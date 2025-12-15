@@ -1,5 +1,7 @@
 package com.statickev.flecion.presentation.viewModel
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -8,12 +10,16 @@ import androidx.lifecycle.viewModelScope
 import com.statickev.flecion.data.model.Task
 import com.statickev.flecion.data.model.TaskStatus
 import com.statickev.flecion.data.repository.TaskRepository
+import com.statickev.flecion.platform.scheduler.cancelTaskReminder
+import com.statickev.flecion.platform.scheduler.scheduleTaskReminder
 import com.statickev.flecion.presentation.adapter.TaskAdapter.Companion.TASK_ID
 import com.statickev.flecion.presentation.presentationUtil.doAtIsValid
 import com.statickev.flecion.presentation.presentationUtil.dueIsValid
 import com.statickev.flecion.presentation.presentationUtil.remindAtIsValid
 import com.statickev.flecion.util.getDateTimeFormatter
+import com.statickev.flecion.util.toEpochMillis
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,7 +33,8 @@ import javax.inject.Inject
 @HiltViewModel
 class TaskDetailViewModel @Inject constructor(
     private val repo: TaskRepository,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private val taskId = savedStateHandle.get<Int>(TASK_ID)!!
 
@@ -96,11 +103,16 @@ class TaskDetailViewModel @Inject constructor(
                     }
                 )
 
-                repo.updateTask(updatedTask)
+                @SuppressLint("ScheduleExactAlarm")
+                if (updatedTask.remindAt != null) scheduleTaskReminder(
+                    context = appContext,
+                    taskId = updatedTask.id,
+                    taskTitle = updatedTask.title,
+                    triggerAtMillis = updatedTask.remindAt!!.toEpochMillis()
+                )
+                else cancelTaskReminder(appContext, updatedTask.id)
 
-//                _remindAtError.value = updatedTask.remindAt?.let { updatedTask ->
-//                    remindAtIsValid(updatedTask, it.due, it.doAt)
-//                }
+                repo.updateTask(updatedTask)
 
                 validate(updatedTask)
             }

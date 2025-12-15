@@ -2,6 +2,7 @@ package com.statickev.flecion.data.repository
 
 import com.statickev.flecion.data.dao.TaskDAO
 import com.statickev.flecion.data.model.Task
+import com.statickev.flecion.platform.scheduler.scheduleTaskReminder
 import kotlinx.coroutines.flow.Flow
 
 class TaskRepository (
@@ -23,8 +24,8 @@ class TaskRepository (
         taskDao.insertTasks(tasks)
     }
 
-    suspend fun insertTask(task: Task) {
-        taskDao.insertTask(task)
+    suspend fun insertTask(task: Task): Long {
+        return taskDao.insertTask(task)
     }
 
     suspend fun updateTask(task: Task) {

@@ -10,58 +10,76 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.viewbinding.ViewBinding
+import androidx.recyclerview.widget.RecyclerView
 import com.statickev.flecion.R
 import com.statickev.flecion.data.model.Task
 import com.statickev.flecion.data.model.TaskStatus
 import com.statickev.flecion.databinding.ActivityMainBinding
-import com.statickev.flecion.databinding.CardQuoteBinding
-import com.statickev.flecion.databinding.CardStatusOngoingBinding
-import com.statickev.flecion.databinding.CardStatusOnholdBinding
-import com.statickev.flecion.databinding.CardStatusPendingBinding
 import com.statickev.flecion.presentation.adapter.TaskAdapter
-import com.statickev.flecion.presentation.presentationUtil.highlight
 import com.statickev.flecion.presentation.presentationUtil.generalSetup
 import com.statickev.flecion.presentation.presentationUtil.showSnackbar
-import com.statickev.flecion.presentation.presentationUtil.unhighlight
+import com.statickev.flecion.presentation.presentationUtil.showUndoSnackbar
 import com.statickev.flecion.presentation.viewModel.TaskViewModel
 import com.statickev.flecion.util.getDayDateFormatter
 import com.statickev.flecion.util.getGreeting
 import com.statickev.flecion.util.minsToFormattedDuration
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 private const val animateDuration: Long = 300
+private const val shiftDuration: Long = 150
+private const val shiftDistance = 40f
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private val taskViewModel: TaskViewModel by viewModels()
-    private var taskJob: Job? = null
-    private lateinit var adapter: TaskAdapter
-
     private lateinit var binding: ActivityMainBinding
-    private lateinit var pendingCardBinding: CardStatusPendingBinding
-    private lateinit var onHoldCardBinding: CardStatusOnholdBinding
-    private lateinit var ongoingCardBinding: CardStatusOngoingBinding
-    private var tempCardBinding: ViewBinding? = null
-    private lateinit var quoteCardBiding: CardQuoteBinding
+    private val taskViewModel: TaskViewModel by viewModels()
+    private var selectedCard: CardView? = null
+    private lateinit var taskAdapter: TaskAdapter
+    private var taskJob: Job? = null
+
     private val addTaskLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val taskCreated = result.data?.getBooleanExtra("taskCreated", false) ?: false
                 if (taskCreated) {
-                    showSnackbar(binding.root, "Task added!")
+                    showSnackbar(binding.root, "Task added")
                 }
             }
         }
+    val ithDeleteTask = ItemTouchHelper(
+        object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(
+                viewHolder: RecyclerView.ViewHolder,
+                direction: Int
+            ) {
+                val position = viewHolder.bindingAdapterPosition
+                if (position == RecyclerView.NO_POSITION) return
+
+                val task = taskAdapter.getTaskAt(position)
+                taskViewModel.deleteTask(task)
+            }
+        }
+    )
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,10 +87,6 @@ class MainActivity : AppCompatActivity() {
         generalSetup(this)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-        pendingCardBinding = CardStatusPendingBinding.bind(binding.root.findViewById(R.id.cv_pending))
-        onHoldCardBinding = CardStatusOnholdBinding.bind(binding.root.findViewById(R.id.cv_onhold))
-        ongoingCardBinding = CardStatusOngoingBinding.bind(binding.root.findViewById(R.id.cv_ongoing))
-        quoteCardBiding = CardQuoteBinding.bind(binding.root.findViewById(R.id.cv_quote))
 
         val sampleTasks = buildList {
             repeat(8) { i ->
@@ -128,175 +142,112 @@ class MainActivity : AppCompatActivity() {
         } // TODO: Delete on production.
         taskViewModel.addTasks(sampleTasks) // TODO: Delete on production.
 
-        adapter = TaskAdapter(emptyList())
-        binding.rvTasks.adapter = adapter
-        binding.rvTasks.layoutManager = LinearLayoutManager(this)
+        with (binding) {
+            taskAdapter = TaskAdapter(emptyList())
+            rvTasks.adapter = taskAdapter
+            rvTasks.layoutManager = LinearLayoutManager(this.root.context)
 
-        pendingCardBinding.unhighlight(
-            onHoldCardBinding,
-            ongoingCardBinding
-        )
-        onHoldCardBinding.unhighlight(
-            pendingCardBinding,
-            ongoingCardBinding
-        )
-        ongoingCardBinding.unhighlight(
-            pendingCardBinding,
-            onHoldCardBinding
-        )
-
-        binding.rvTasks.post {
-            binding.rvTasks.translationY = binding.rvTasks.height.toFloat()
-        }
-        binding.fabAdd.post {
-            binding.fabAdd.translationX = binding.fabAdd.width.toFloat() * 2
-        }
-        binding.tvDate.text = LocalDate.now().format(getDayDateFormatter())
-        binding.tvGreeting.text = getGreeting()
-
-        cvStatusSetOnClickListener(pendingCardBinding)
-        cvStatusSetOnClickListener(onHoldCardBinding)
-        cvStatusSetOnClickListener(ongoingCardBinding)
-        binding.fabAdd.setOnClickListener {
-            val intent = Intent(this, NewTaskActivity::class.java)
-            addTaskLauncher.launch(intent)
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    taskViewModel.pendingTaskState.collect {
-                        """Pending (${it.count()})"""
-                            .also { pendingCardBinding.tvTypeCount.text = it }
-
-                        val totalTime = it.sumOf { task -> task.timeLeftToComplete }
-                        """Total time: ${minsToFormattedDuration(totalTime)}"""
-                            .also { pendingCardBinding.tvTimeToComplete.text = it }
-                    }
-                }
-                launch {
-                    taskViewModel.onHoldTaskState.collect {
-                        """On Hold (${it.count()})"""
-                            .also { onHoldCardBinding.tvTypeCount.text = it }
-
-                        val totalTime = it.sumOf { task -> task.timeLeftToComplete }
-                        """Total time: ${minsToFormattedDuration(totalTime)}"""
-                            .also { onHoldCardBinding.tvTimeToComplete.text = it }
-                    }
-                }
-                launch {
-                    taskViewModel.ongoingTaskState.collect {
-                        """Ongoing (${it.count()})"""
-                            .also { ongoingCardBinding.tvTypeCount.text = it }
-
-                        val totalTime = it.sumOf { task -> task.timeLeftToComplete }
-                        """Total time: ${minsToFormattedDuration(totalTime)}"""
-                            .also { ongoingCardBinding.tvTimeToComplete.text = it }
-                    }
-                }
+            rvTasks.post {
+                rvTasks.translationY = rvTasks.height.toFloat() + rvTasks.paddingBottom
             }
-        }
+            ithDeleteTask.attachToRecyclerView(rvTasks)
 
-//        ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(binding.rvTasks)
+            tvDate.text = LocalDate.now().format(getDayDateFormatter())
+            tvGreeting.text = getGreeting()
 
-        setContentView(binding.root)
-    }
-
-    private fun cvStatusSetOnClickListener(binding: ViewBinding) {
-        fun observeTasks(flow: Flow<List<Task>>) {
-            taskJob?.cancel()
-            taskJob = lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    flow.collect { tasks ->
-                        adapter.submitList(tasks)
-                    }
-                }
-            }
-        }
-
-        val cardView = when (binding) {
-            is CardStatusPendingBinding -> binding.cvStatus
-            is CardStatusOnholdBinding -> binding.cvStatus
-            is CardStatusOngoingBinding -> binding.cvStatus
-            else -> return
-        }
-
-        cardView.setOnClickListener {
-            val tempBinding = when (binding) {
-                is CardStatusPendingBinding -> binding
-                is CardStatusOnholdBinding -> binding
-                is CardStatusOngoingBinding -> binding
-                else -> return@setOnClickListener
-            }
-
-            when (tempBinding) {
-                is CardStatusPendingBinding -> observeTasks(taskViewModel.pendingTaskState)
-                is CardStatusOnholdBinding -> observeTasks(taskViewModel.onHoldTaskState)
-                is CardStatusOngoingBinding -> observeTasks(taskViewModel.ongoingTaskState)
-            }
-
-            if (tempCardBinding?.let { tempBinding::class == it::class } == true) {
-                when (binding) {
-                    is CardStatusPendingBinding -> {
-                        (tempCardBinding as CardStatusPendingBinding).unhighlight(
-                            onHoldCardBinding,
-                            ongoingCardBinding
-                        )
-                    }
-                    is CardStatusOnholdBinding -> {
-                        (tempCardBinding as CardStatusOnholdBinding).unhighlight(
-                            pendingCardBinding,
-                            ongoingCardBinding
-                        )
-                    }
-                    is CardStatusOngoingBinding -> {
-                        (tempCardBinding as CardStatusOngoingBinding).unhighlight(
-                            pendingCardBinding,
-                            onHoldCardBinding
-                        )
-                    }
-                }
-                tempCardBinding = null
-
-                with (this.binding) {
-//                    root.setBackgroundColor(ContextCompat.getColor(
-//                        root.context,
-//                        R.color.light_gray_sec
-//                    ))
-
-                    popupMenu.apply {
-                        animate()
-                            .translationY(0f)
-                            .setDuration(animateDuration)
-                            .setInterpolator(DecelerateInterpolator())
-                            .start()
-                    }
-
-                    rvTasks.apply {
-                        animate()
-                            .translationY(this.height.toFloat())
-                            .setDuration(animateDuration)
-                            .setInterpolator(AccelerateInterpolator())
-                            .start()
-                    }
-
-                    fabAdd.apply {
-                        animate()
-                            .translationX(this.width.toFloat() * 2)
-                            .setDuration(animateDuration)
-                            .setInterpolator(AccelerateInterpolator())
-                            .start()
+            cvPending.setOnClickListener {
+                taskJob?.cancel()
+                taskJob = lifecycleScope.launch {
+                    repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        taskViewModel.pendingTaskState.collect { tasks ->
+                            taskAdapter.submitList(tasks)
+                        }
                     }
                 }
 
-                return@setOnClickListener
-            } else {
-                with (this.binding) {
-                    popupMenu.animate()
-                        .translationY(popupMenu.height.toFloat())
+                if (selectedCard?.id == R.id.cv_pending) {
+                    cvPending.scaleX = 1f
+                    cvPending.scaleY = 1f
+                    cvPending.setCardBackgroundColor(ContextCompat.getColor(
+                        root.context,
+                        R.color.md_theme_outlineVariant
+                    ))
+
+                    cvOnhold.animate()
+                        .translationX(0f)
+                        .setDuration(shiftDuration)
+                        .start()
+                    cvOngoing.animate()
+                        .translationX(0f)
+                        .setDuration(shiftDuration)
+                        .start()
+
+                    rvTasks.animate()
+                        .translationY(rvTasks.height.toFloat() + rvTasks.paddingBottom)
                         .setDuration(animateDuration)
                         .setInterpolator(AccelerateInterpolator())
                         .start()
+
+                    selectedCard = null
+                }
+                else {
+                    cvPending.scaleX = 1.15f
+                    cvPending.scaleY = 1.15f
+                    cvPending.setCardBackgroundColor(ContextCompat.getColor(
+                        root.context,
+                        R.color.md_theme_primaryContainer
+                    ))
+
+                    cvOnhold.animate()
+                        .translationX(-shiftDistance)
+                        .setDuration(shiftDuration)
+                        .start()
+                    cvOngoing.animate()
+                        .translationX(-shiftDistance)
+                        .setDuration(shiftDuration)
+                        .start()
+
+                    svStatusButton.smoothScrollTo(
+                        svStatusButton.getChildAt(0).right,
+                        0
+                    )
+
+                    when (selectedCard?.id) {
+                        R.id.cv_onhold -> {
+                            cvOnhold.scaleX = 1f
+                            cvOnhold.scaleY = 1f
+                            cvOnhold.setCardBackgroundColor(ContextCompat.getColor(
+                                root.context,
+                                R.color.md_theme_outlineVariant
+                            ))
+
+                            cvPending.animate()
+                                .translationX(0f)
+                                .setDuration(150)
+                                .start()
+                            cvOngoing.animate()
+                                .translationX(-shiftDistance)
+                                .setDuration(150)
+                                .start()
+                        }
+                        R.id.cv_ongoing -> {
+                            cvOngoing.scaleX = 1f
+                            cvOngoing.scaleY = 1f
+                            cvOngoing.setCardBackgroundColor(ContextCompat.getColor(
+                                root.context,
+                                R.color.md_theme_outlineVariant
+                            ))
+
+                            cvPending.animate()
+                                .translationX(0f)
+                                .setDuration(150)
+                                .start()
+                            cvOnhold.animate()
+                                .translationX(-shiftDistance)
+                                .setDuration(150)
+                                .start()
+                        }
+                    }
 
                     rvTasks.animate()
                         .translationY(0f)
@@ -304,90 +255,270 @@ class MainActivity : AppCompatActivity() {
                         .setInterpolator(DecelerateInterpolator())
                         .start()
 
-                    fabAdd.animate()
+                    selectedCard = cvPending
+                }
+            }
+
+            cvOnhold.setOnClickListener {
+                taskJob?.cancel()
+                taskJob = lifecycleScope.launch {
+                    repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        taskViewModel.onHoldTaskState.collect { tasks ->
+                            taskAdapter.submitList(tasks)
+                        }
+                    }
+                }
+
+                if (selectedCard?.id == R.id.cv_onhold) {
+                    cvOnhold.scaleX = 1f
+                    cvOnhold.scaleY = 1f
+                    cvOnhold.setCardBackgroundColor(ContextCompat.getColor(
+                        root.context,
+                        R.color.md_theme_outlineVariant
+                    ))
+
+                    cvPending.animate()
                         .translationX(0f)
+                        .setDuration(150)
+                        .start()
+                    cvOngoing.animate()
+                        .translationX(0f)
+                        .setDuration(150)
+                        .start()
+
+                    rvTasks.animate()
+                        .translationY(rvTasks.height.toFloat() + rvTasks.paddingBottom)
+                        .setDuration(animateDuration)
+                        .setInterpolator(AccelerateInterpolator())
+                        .start()
+
+                    selectedCard = null
+                }
+                else {
+                    cvOnhold.scaleX = 1.15f
+                    cvOnhold.scaleY = 1.15f
+                    cvOnhold.setCardBackgroundColor(ContextCompat.getColor(
+                        root.context,
+                        R.color.md_theme_primaryContainer
+                    ))
+
+                    cvPending.animate()
+                        .translationX(shiftDistance)
+                        .setDuration(150)
+                        .start()
+                    cvOngoing.animate()
+                        .translationX(-shiftDistance)
+                        .setDuration(150)
+                        .start()
+
+                    val ll = svStatusButton.getChildAt(0) as LinearLayout
+                    val middle = ll.getChildAt(0).width / 2
+                    svStatusButton.smoothScrollTo(
+                        svStatusButton.getChildAt(0).left + middle,
+                        0
+                    )
+
+                    when (selectedCard?.id) {
+                        R.id.cv_pending -> {
+                            cvPending.scaleX = 1f
+                            cvPending.scaleY = 1f
+                            cvPending.setCardBackgroundColor(ContextCompat.getColor(
+                                root.context,
+                                R.color.md_theme_outlineVariant
+                            ))
+
+                            cvOnhold.animate()
+                                .translationX(0f)
+                                .setDuration(150)
+                                .start()
+                            cvOngoing.animate()
+                                .translationX(-shiftDistance)
+                                .setDuration(150)
+                                .start()
+                        }
+                        R.id.cv_ongoing -> {
+                            cvOngoing.scaleX = 1f
+                            cvOngoing.scaleY = 1f
+                            cvOngoing.setCardBackgroundColor(ContextCompat.getColor(
+                                root.context,
+                                R.color.md_theme_outlineVariant
+                            ))
+
+                            cvPending.animate()
+                                .translationX(shiftDistance)
+                                .setDuration(150)
+                                .start()
+                            cvOnhold.animate()
+                                .translationX(0f)
+                                .setDuration(150)
+                                .start()
+                        }
+                    }
+
+                    rvTasks.animate()
+                        .translationY(0f)
                         .setDuration(animateDuration)
                         .setInterpolator(DecelerateInterpolator())
                         .start()
+
+                    selectedCard = cvOnhold
                 }
             }
 
-            when (tempCardBinding) {
-                is CardStatusPendingBinding -> (tempCardBinding as CardStatusPendingBinding).unhighlight(
-                    onHoldCardBinding,
-                    ongoingCardBinding
-                )
-                is CardStatusOnholdBinding -> (tempCardBinding as CardStatusOnholdBinding).unhighlight(
-                    pendingCardBinding,
-                    ongoingCardBinding
-                )
-                is CardStatusOngoingBinding -> (tempCardBinding as CardStatusOngoingBinding).unhighlight(
-                    pendingCardBinding,
-                    onHoldCardBinding
-                )
+            cvOngoing.setOnClickListener {
+                taskJob?.cancel()
+                taskJob = lifecycleScope.launch {
+                    repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        taskViewModel.ongoingTaskState.collect { tasks ->
+                            taskAdapter.submitList(tasks)
+                        }
+                    }
+                }
+
+                if (selectedCard?.id == R.id.cv_ongoing) {
+                    cvOngoing.scaleX = 1f
+                    cvOngoing.scaleY = 1f
+                    cvOngoing.setCardBackgroundColor(ContextCompat.getColor(
+                        root.context,
+                        R.color.md_theme_outlineVariant
+                    ))
+
+                    cvPending.animate()
+                        .translationX(0f)
+                        .setDuration(150)
+                        .start()
+                    cvOnhold.animate()
+                        .translationX(0f)
+                        .setDuration(150)
+                        .start()
+
+                    rvTasks.animate()
+                        .translationY(rvTasks.height.toFloat() + rvTasks.paddingBottom)
+                        .setDuration(animateDuration)
+                        .setInterpolator(AccelerateInterpolator())
+                        .start()
+
+                    selectedCard = null
+                }
+                else {
+                    cvOngoing.scaleX = 1.15f
+                    cvOngoing.scaleY = 1.15f
+                    cvOngoing.setCardBackgroundColor(ContextCompat.getColor(
+                        root.context,
+                        R.color.md_theme_primaryContainer
+                    ))
+
+                    cvPending.animate()
+                        .translationX(shiftDistance)
+                        .setDuration(150)
+                        .start()
+                    cvOnhold.animate()
+                        .translationX(shiftDistance)
+                        .setDuration(150)
+                        .start()
+
+                    svStatusButton.smoothScrollTo(0, 0)
+
+                    when (selectedCard?.id) {
+                        R.id.cv_pending -> {
+                            cvPending.scaleX = 1f
+                            cvPending.scaleY = 1f
+                            cvPending.setCardBackgroundColor(ContextCompat.getColor(
+                                root.context,
+                                R.color.md_theme_outlineVariant
+                            ))
+
+                            cvOnhold.animate()
+                                .translationX(shiftDistance)
+                                .setDuration(150)
+                                .start()
+                            cvOngoing.animate()
+                                .translationX(0f)
+                                .setDuration(150)
+                                .start()
+                        }
+                        R.id.cv_onhold -> {
+                            cvOnhold.scaleX = 1f
+                            cvOnhold.scaleY = 1f
+                            cvOnhold.setCardBackgroundColor(ContextCompat.getColor(
+                                root.context,
+                                R.color.md_theme_outlineVariant
+                            ))
+
+                            cvPending.animate()
+                                .translationX(shiftDistance)
+                                .setDuration(150)
+                                .start()
+                            cvOngoing.animate()
+                                .translationX(0f)
+                                .setDuration(150)
+                                .start()
+                        }
+                    }
+
+                    rvTasks.animate()
+                        .translationY(0f)
+                        .setDuration(animateDuration)
+                        .setInterpolator(DecelerateInterpolator())
+                        .start()
+
+                    selectedCard = cvOngoing
+                }
             }
 
-            when (binding) {
-                is CardStatusPendingBinding -> {
-                    binding.highlight(
-                        this.binding,
-                        onHoldCardBinding,
-                        ongoingCardBinding
-                    )
-                    this.binding.svStatusButton.smoothScrollTo(
-                        this.binding.svStatusButton.getChildAt(0).right,
-                        0
-                    )
-                }
-                is CardStatusOnholdBinding -> {
-                    binding.highlight(
-                        this.binding,
-                        pendingCardBinding,
-                        ongoingCardBinding
-                    )
-                    val ll = this.binding.svStatusButton.getChildAt(0) as LinearLayout
-                    val middle = ll.getChildAt(0).width / 2
-                    this.binding.svStatusButton.smoothScrollTo(
-                        this.binding.svStatusButton.getChildAt(0).left + middle,
-                        0
-                    )
-                }
-                is CardStatusOngoingBinding -> {
-                    binding.highlight(
-                        this.binding,
-                        pendingCardBinding,
-                        onHoldCardBinding
-                    )
-                    this.binding.svStatusButton.smoothScrollTo(0, 0)
-                }
+            fabAdd.setOnClickListener {
+                val intent = Intent(this.root.context, NewTaskActivity::class.java)
+                addTaskLauncher.launch(intent)
             }
 
-            tempCardBinding = binding
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    launch {
+                        taskViewModel.pendingTaskState.collect { it ->
+                            """Pending (${it.count()})"""
+                                .also { tvTypeCountPending.text = it }
+
+                            val totalTime = it.sumOf { task -> task.timeLeftToComplete }
+                            """Total time: ${minsToFormattedDuration(totalTime)}"""
+                                .also { tvTimeToCompletePending.text = it }
+                        }
+                    }
+                    launch {
+                        taskViewModel.onHoldTaskState.collect { it ->
+                            """On Hold (${it.count()})"""
+                                .also { tvTypeCountOnhold.text = it }
+
+                            val totalTime = it.sumOf { task -> task.timeLeftToComplete }
+                            """Total time: ${minsToFormattedDuration(totalTime)}"""
+                                .also { tvTimeToCompleteOnhold.text = it }
+                        }
+                    }
+                    launch {
+                        taskViewModel.ongoingTaskState.collect { it ->
+                            """Ongoing (${it.count()})"""
+                                .also { tvTypeCountOngoing.text = it }
+
+                            val totalTime = it.sumOf { task -> task.timeLeftToComplete }
+                            """Total time: ${minsToFormattedDuration(totalTime)}"""
+                                .also { tvTimeToCompleteOngoing.text = it }
+                        }
+                    }
+                    launch {
+                        taskViewModel.uiEvent.collect { event ->
+                            when (event) {
+                                is TaskViewModel.UiEvent.ShowSnackbarOnDelete -> showUndoSnackbar(
+                                    binding.root,
+                                    event.message
+                                ) {
+                                    taskViewModel.addTask(event.deletedTask)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        setContentView(binding.root)
     }
-
-//    val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
-//        ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-//        0 // swipe disabled
-//    ) {
-//        override fun onMove(
-//            recyclerView: RecyclerView,
-//            viewHolder: RecyclerView.ViewHolder,
-//            target: RecyclerView.ViewHolder
-//        ): Boolean {
-//            // TODO: Implement the move action later.
-////            val fromPos = viewHolder.adapterPosition
-////            val toPos = target.adapterPosition
-////
-////            adapter.moveItem(fromPos, toPos)
-//            return true
-//        }
-//
-//        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-//            // not needed since we don’t swipe
-//        }
-//
-//        override fun isLongPressDragEnabled(): Boolean = true
-//    }
-
 }

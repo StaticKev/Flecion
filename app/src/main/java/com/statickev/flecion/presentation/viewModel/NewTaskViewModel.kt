@@ -1,5 +1,9 @@
 package com.statickev.flecion.presentation.viewModel
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Build
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,18 +11,22 @@ import androidx.lifecycle.viewModelScope
 import com.statickev.flecion.data.model.Task
 import com.statickev.flecion.data.model.TaskStatus
 import com.statickev.flecion.data.repository.TaskRepository
+import com.statickev.flecion.platform.scheduler.scheduleTaskReminder
 import com.statickev.flecion.presentation.presentationUtil.doAtIsValid
 import com.statickev.flecion.presentation.presentationUtil.dueIsValid
 import com.statickev.flecion.presentation.presentationUtil.remindAtIsValid
 import com.statickev.flecion.util.getDateTimeFormatter
+import com.statickev.flecion.util.toEpochMillis
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
 class NewTaskViewModel @Inject constructor (
-    private val taskRepo: TaskRepository
+    private val taskRepo: TaskRepository,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
     private val _newTask = Task()
 
@@ -156,7 +164,18 @@ class NewTaskViewModel @Inject constructor (
 
     fun addTask() {
         viewModelScope.launch {
-            taskRepo.insertTask(_newTask)
+            val taskId = taskRepo.insertTask(_newTask)
+
+            @SuppressLint("ScheduleExactAlarm")
+            _newTask.remindAt?.let { remindAt ->
+                scheduleTaskReminder(
+                    context = appContext,
+                    taskId = taskId,
+                    taskTitle = _newTask.title,
+                    triggerAtMillis = remindAt.toEpochMillis()
+                )
+            }
+
             _onTaskAdded.postValue(true)
         }
     }

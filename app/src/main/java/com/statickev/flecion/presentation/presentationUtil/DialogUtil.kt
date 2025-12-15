@@ -74,3 +74,27 @@ fun showSnackbar(view: View, message: String) {
 
     snack.show()
 }
+
+fun showUndoSnackbar(
+    view: View,
+    message: String,
+    onUndo: () -> Unit
+) {
+    val snack = Snackbar.make(view, message, Snackbar.LENGTH_LONG)
+
+    snack.setAction("Undo") {
+        onUndo()
+    }
+
+    val snackbarView = snack.view
+    snackbarView.setBackgroundResource(R.drawable.drawable_snackbar_container)
+
+    val text = snackbarView.findViewById<TextView>(
+        com.google.android.material.R.id.snackbar_text
+    )
+    text.setTextColor(Color.WHITE)
+    text.textSize = 16f
+    text.maxLines = 2
+
+    snack.show()
+}

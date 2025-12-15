@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 @Entity(tableName = "tasks")
 data class Task(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     var title: String = "New Task",
     var description: String? = "",
     var status: TaskStatus = TaskStatus.PENDING,

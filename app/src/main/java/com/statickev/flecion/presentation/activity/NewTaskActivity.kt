@@ -157,11 +157,6 @@ class NewTaskActivity : AppCompatActivity() {
 
                                 binding.etRemindAt.setText(getConcatenatedDateTime(dateMillis, timeMinutes))
                                 viewModel.onRemindAtChanged(binding.etRemindAt.text.toString())
-                                // TODO: Remove when the feature is implemented.
-                                Toast.makeText(
-                                    context,
-                                    "This feature is under development!",
-                                    Toast.LENGTH_SHORT).show()
                             } catch (_: CancellationException) { }
                         }
                     } else {

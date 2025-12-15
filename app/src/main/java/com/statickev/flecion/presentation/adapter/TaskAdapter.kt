@@ -1,8 +1,10 @@
 package com.statickev.flecion.presentation.adapter
 
 import android.annotation.SuppressLint
+import android.content.ClipData
 import android.content.Intent
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.statickev.flecion.data.model.Task
@@ -41,16 +43,14 @@ class TaskAdapter(
         val task = tasks[position]
         with(holder.binding) {
             tvTitle.text = task.title
-            if (minsToFormattedDuration(task.timeLeftToComplete).isBlank()) {
-                tvTimeToComplete.text = minsToFormattedDuration(task.timeLeftToComplete)
+
+            if (task.timeLeftToComplete == 0) tvTimeToComplete.text = ""
+            else tvTimeToComplete.text = buildString {
+                append(minsToFormattedDuration(task.timeLeftToComplete))
+                append(" left")
             }
-            else {
-                tvTimeToComplete.text = buildString {
-                    append(minsToFormattedDuration(task.timeLeftToComplete))
-                    append(" left")
-                }
-            }
-            tvDueDate.text = task.due?.let { it.toLocalDate().format(getDateFormatter()) } ?: ""
+
+            tvDueDate.text = task.due?.toLocalDate()?.format(getDateFormatter()) ?: ""
             pbProgress.progress = task.completionRate
             tvProgressPercentage.text = buildString {
                 append(task.completionRate.toString())
@@ -67,6 +67,8 @@ class TaskAdapter(
     }
 
     override fun getItemCount() = tasks.size
+
+    fun getTaskAt(position: Int): Task = tasks[position]
 
     @SuppressLint("NotifyDataSetChanged")
     fun submitList(newTasks: List<Task>) {

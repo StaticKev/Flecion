@@ -15,8 +15,9 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TaskDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTask(task: Task)
+    suspend fun insertTask(task: Task): Long
 
+    // TODO: Delete on production.
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTasks(tasks: List<Task>)
 
