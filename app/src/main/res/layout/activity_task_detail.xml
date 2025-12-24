@@ -88,6 +88,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Title"
+                android:textColor="@color/md_theme_onBackground"
+                android:textColorHighlight="@color/md_theme_inversePrimary_highContrast"
+                android:textColorHint="@color/md_theme_onBackground"
                 android:textSize="26sp"
                 tools:ignore="HardcodedText" />
 
@@ -97,6 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Status"
+                android:textColor="@color/md_theme_onBackground"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.067"
                 app:layout_constraintStart_toStartOf="parent"
@@ -201,6 +205,7 @@
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:text="Completion Rate"
+                    android:textColor="@color/md_theme_onBackground"
                     tools:ignore="HardcodedText" />
 
                 <TextView
@@ -209,6 +214,7 @@
                     android:layout_height="wrap_content"
                     android:text="0%"
                     android:textAlignment="textEnd"
+                    android:textColor="@color/md_theme_onBackground"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
 
@@ -237,6 +243,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Time to Complete"
+                    android:textColor="@color/md_theme_onBackground"
                     tools:ignore="HardcodedText" />
 
                 <TextView
@@ -245,6 +252,7 @@
                     android:layout_height="wrap_content"
                     android:text="00h 00m"
                     android:textAlignment="textEnd"
+                    android:textColor="@color/md_theme_onBackground"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
 
@@ -259,6 +267,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Priority Level"
+                    android:textColor="@color/md_theme_onBackground"
                     tools:ignore="HardcodedText" />
 
                 <TextView
@@ -267,6 +276,7 @@
                     android:layout_height="wrap_content"
                     android:text="1"
                     android:textAlignment="textEnd"
+                    android:textColor="@color/md_theme_onBackground"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
 
@@ -328,6 +338,7 @@
                 android:layout_marginHorizontal="15dp"
                 android:layout_marginTop="10dp"
                 android:text="Add to calendar"
+                android:textColor="@color/md_theme_onBackground"
                 tools:ignore="HardcodedText,UseSwitchCompatOrMaterialXml" />
 
             <com.google.android.material.textfield.TextInputLayout

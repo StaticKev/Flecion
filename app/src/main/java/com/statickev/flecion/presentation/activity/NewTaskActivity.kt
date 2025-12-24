@@ -66,14 +66,6 @@ class NewTaskActivity : AppCompatActivity() {
                     .show()
             }
 
-            btnInfo.setOnClickListener {
-                // TODO: Remove when the feature is implemented.
-                Toast.makeText(
-                    baseContext,
-                    "This feature is under development!",
-                    Toast.LENGTH_SHORT).show()
-            }
-
             etHours.filters = arrayOf(
                 InputFilter { source, start, end, dest, dstart, dend ->
                     val newValue = (dest.subSequence(0, dstart).toString() +

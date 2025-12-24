@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.Lumina" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Theme.Lumina" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:stateListAnimator">@null</item>
         <!-- Optional: prevent clipping of shadows -->
         <item name="android:clipChildren">false</item>

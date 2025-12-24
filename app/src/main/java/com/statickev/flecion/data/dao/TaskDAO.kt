@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.statickev.flecion.data.model.Task
 import kotlinx.coroutines.flow.Flow
+import java.sql.Timestamp
 
 // TODO: Create a function to delete tasks if it's not within this week.
 // TODO: Create a function to return the number of completed tasks this week.
@@ -27,12 +28,6 @@ interface TaskDAO {
     @Delete
     suspend fun deleteTask(task: Task)
 
-    @Query("SELECT * FROM tasks WHERE id = :id")
-    fun getTaskById(id: Int): Flow<Task?>
-
-    @Query("SELECT * FROM tasks WHERE completionRate != 100")
-    fun getAllTasks(): Flow<List<Task>>
-
     @Query("SELECT * FROM tasks WHERE status = 'PENDING'")
     fun getPendingTasks(): Flow<List<Task>>
 
@@ -42,6 +37,9 @@ interface TaskDAO {
     @Query("SELECT * FROM tasks WHERE status = 'ONGOING'")
     fun getOngoingTasks(): Flow<List<Task>>
 
-    @Query("SELECT * FROM tasks WHERE completionRate = 80")
-    fun getTaskCPR80(): Flow<List<Task>>
+    @Query("SELECT * FROM tasks WHERE id = :id")
+    fun getTaskById(id: Int): Flow<Task?>
+
+    @Query("SELECT * FROM tasks WHERE doAt = :dateMillis")
+    fun getTaskByDate(dateMillis: Long)
 }

@@ -12,6 +12,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -38,7 +39,7 @@ import java.time.LocalDateTime
 
 private const val animateDuration: Long = 300
 private const val shiftDuration: Long = 150
-private const val shiftDistance = 40f
+private const val shiftDistance = 30f
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -153,7 +154,13 @@ class MainActivity : AppCompatActivity() {
             ithDeleteTask.attachToRecyclerView(rvTasks)
 
             tvDate.text = LocalDate.now().format(getDayDateFormatter())
-            tvGreeting.text = getGreeting()
+
+            btnMenu.setOnClickListener {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                }
+                else drawerLayout.openDrawer(GravityCompat.START)
+            }
 
             cvPending.setOnClickListener {
                 taskJob?.cancel()
@@ -188,11 +195,17 @@ class MainActivity : AppCompatActivity() {
                         .setInterpolator(AccelerateInterpolator())
                         .start()
 
+                    flContainer.animate()
+                        .translationY(0f)
+                        .setDuration(animateDuration)
+                        .setInterpolator(AccelerateInterpolator())
+                        .start()
+
                     selectedCard = null
                 }
                 else {
-                    cvPending.scaleX = 1.15f
-                    cvPending.scaleY = 1.15f
+                    cvPending.scaleX = 1.1f
+                    cvPending.scaleY = 1.1f
                     cvPending.setCardBackgroundColor(ContextCompat.getColor(
                         root.context,
                         R.color.md_theme_primaryContainer
@@ -255,6 +268,12 @@ class MainActivity : AppCompatActivity() {
                         .setInterpolator(DecelerateInterpolator())
                         .start()
 
+                    flContainer.animate()
+                        .translationY(-flContainer.height.toFloat())
+                        .setDuration(animateDuration)
+                        .setInterpolator(AccelerateInterpolator())
+                        .start()
+
                     selectedCard = cvPending
                 }
             }
@@ -292,11 +311,17 @@ class MainActivity : AppCompatActivity() {
                         .setInterpolator(AccelerateInterpolator())
                         .start()
 
+                    flContainer.animate()
+                        .translationY(0f)
+                        .setDuration(animateDuration)
+                        .setInterpolator(AccelerateInterpolator())
+                        .start()
+
                     selectedCard = null
                 }
                 else {
-                    cvOnhold.scaleX = 1.15f
-                    cvOnhold.scaleY = 1.15f
+                    cvOnhold.scaleX = 1.1f
+                    cvOnhold.scaleY = 1.1f
                     cvOnhold.setCardBackgroundColor(ContextCompat.getColor(
                         root.context,
                         R.color.md_theme_primaryContainer
@@ -312,7 +337,7 @@ class MainActivity : AppCompatActivity() {
                         .start()
 
                     val ll = svStatusButton.getChildAt(0) as LinearLayout
-                    val middle = ll.getChildAt(0).width / 2
+                    val middle = ll.getChildAt(0).width / 2 - 45
                     svStatusButton.smoothScrollTo(
                         svStatusButton.getChildAt(0).left + middle,
                         0
@@ -361,6 +386,12 @@ class MainActivity : AppCompatActivity() {
                         .setInterpolator(DecelerateInterpolator())
                         .start()
 
+                    flContainer.animate()
+                        .translationY(-flContainer.height.toFloat())
+                        .setDuration(animateDuration)
+                        .setInterpolator(AccelerateInterpolator())
+                        .start()
+
                     selectedCard = cvOnhold
                 }
             }
@@ -398,11 +429,17 @@ class MainActivity : AppCompatActivity() {
                         .setInterpolator(AccelerateInterpolator())
                         .start()
 
+                    flContainer.animate()
+                        .translationY(0f)
+                        .setDuration(animateDuration)
+                        .setInterpolator(AccelerateInterpolator())
+                        .start()
+
                     selectedCard = null
                 }
                 else {
-                    cvOngoing.scaleX = 1.15f
-                    cvOngoing.scaleY = 1.15f
+                    cvOngoing.scaleX = 1.1f
+                    cvOngoing.scaleY = 1.1f
                     cvOngoing.setCardBackgroundColor(ContextCompat.getColor(
                         root.context,
                         R.color.md_theme_primaryContainer
@@ -460,6 +497,12 @@ class MainActivity : AppCompatActivity() {
                         .translationY(0f)
                         .setDuration(animateDuration)
                         .setInterpolator(DecelerateInterpolator())
+                        .start()
+
+                    flContainer.animate()
+                        .translationY(-flContainer.height.toFloat())
+                        .setDuration(animateDuration)
+                        .setInterpolator(AccelerateInterpolator())
                         .start()
 
                     selectedCard = cvOngoing

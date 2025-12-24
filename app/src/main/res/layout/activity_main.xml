@@ -1,261 +1,321 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/md_theme_background_mediumContrast"
     android:scrollbars="none"
     tools:context=".presentation.activity.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/drawable_secondary_wallpaper1"
-        android:elevation="4dp"
-        android:orientation="horizontal"
-        android:translationZ="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/tv_greeting"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_weight="1"
-            android:paddingTop="55dp"
-            android:paddingBottom="25dp"
-            android:text="Good ___!"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            tools:ignore="HardcodedText" />
-
-        <TextView
-            android:id="@+id/tv_date"
-            android:layout_width="32dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="-2dp"
-            android:layout_marginEnd="40dp"
-            android:layout_weight="1"
-            android:paddingTop="0dp"
-            android:paddingBottom="0dp"
-            android:text="Day, 00 Month 0000"
-            android:textAlignment="textEnd"
-            android:textColor="@color/md_theme_tertiary"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            tools:ignore="HardcodedText,SmallSp" />
-
-    </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_tasks"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:elevation="0dp"
-        android:overScrollMode="never"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="90dp"
-        app:layout_constraintBottom_toTopOf="@+id/popup_menu"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add"
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nv_menu"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:backgroundTint="@color/md_theme_primary"
-        android:clickable="true"
-        android:contentDescription="Add Task"
-        android:elevation="2dp"
-        android:translationZ="2dp"
-        app:layout_constraintBottom_toBottomOf="@+id/rv_tasks"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/baseline_add_24"
-        app:tint="@color/md_theme_onPrimary"
-        tools:ignore="HardcodedText" />
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/drawer_menu">
+    </com.google.android.material.navigation.NavigationView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/popup_menu"
+        android:id="@+id/main"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="bottom"
-        android:background="@drawable/drawable_secondary_wallpaper2"
-        android:elevation="4dp"
-        android:orientation="vertical"
-        android:translationZ="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_height="match_parent"
+        android:background="@color/md_theme_background_mediumContrast"
+        android:scrollbars="none"
+        tools:context=".presentation.activity.MainActivity">
 
-        <HorizontalScrollView
-            android:id="@+id/sv_status_button"
+        <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="35dp"
-            android:paddingBottom="70dp"
-            android:scrollbars="none"
+            android:background="@drawable/drawable_secondary_wallpaper1"
+            android:elevation="4dp"
+            android:orientation="horizontal"
+            android:translationZ="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/btn_menu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="20dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/baseline_menu_24"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/tv_date"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="50dp"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="Day, 00 Month 0000"
+                android:textColor="@color/md_theme_tertiary"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText,SmallSp" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/iv_profile"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/avatar"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/CircleImage"
+                android:layout_marginTop="50dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+<!--            <ImageButton-->
+<!--                android:id="@+id/btn_calendar"-->
+<!--                android:layout_width="40dp"-->
+<!--                android:layout_height="40dp"-->
+<!--                android:layout_marginTop="50dp"-->
+<!--                android:layout_marginEnd="20dp"-->
+<!--                android:layout_marginBottom="20dp"-->
+<!--                android:background="?attr/selectableItemBackgroundBorderless"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent"-->
+<!--                app:srcCompat="@drawable/baseline_calendar_month_24"-->
+<!--                tools:ignore="ContentDescription" />-->
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_tasks"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:elevation="0dp"
             android:overScrollMode="never"
+            android:paddingHorizontal="15dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="85dp"
+            app:layout_constraintBottom_toTopOf="@+id/popup_menu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="@color/md_theme_primary"
+            android:clickable="true"
+            android:contentDescription="Add Task"
+            android:elevation="2dp"
+            android:translationZ="2dp"
+            app:layout_constraintBottom_toTopOf="@+id/popup_menu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/baseline_add_24"
+            app:tint="@color/md_theme_onPrimary"
+            tools:ignore="HardcodedText" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/popup_menu"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/drawable_secondary_wallpaper2"
+            android:elevation="4dp"
+            android:orientation="vertical"
+            android:translationZ="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <LinearLayout
-                android:id="@+id/ll_cards_container"
-                android:layout_width="wrap_content"
+            <HorizontalScrollView
+                android:id="@+id/sv_status_button"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="25dp">
+                android:paddingTop="30dp"
+                android:paddingBottom="70dp"
+                android:scrollbars="none"
+                android:overScrollMode="never"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cv_ongoing"
-                    android:layout_width="150dp"
-                    android:clickable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                <LinearLayout
+                    android:id="@+id/ll_cards_container"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
-                    app:cardBackgroundColor="@color/md_theme_outlineVariant"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:cardElevation="3dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="15dp">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cv_ongoing"
+                        android:layout_width="135dp"
+                        android:clickable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="20dp"
-                        android:paddingTop="20dp"
-                        android:paddingBottom="20dp">
+                        android:layout_marginHorizontal="10dp"
+                        app:cardBackgroundColor="@color/md_theme_outlineVariant"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="3dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                        <TextView
-                            android:id="@+id/tv_typeCount_ongoing"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="3dp"
-                            android:text="Ongoing (0)"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText" />
+                            android:orientation="vertical"
+                            android:paddingHorizontal="20dp"
+                            android:paddingTop="20dp"
+                            android:paddingBottom="20dp">
 
-                        <TextView
-                            android:id="@+id/tv_timeToComplete_ongoing"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="Total time: -"
-                            android:textColor="@color/md_theme_tertiary"
-                            android:textSize="10sp"
-                            tools:ignore="HardcodedText,SmallSp" />
+                            <TextView
+                                android:id="@+id/tv_typeCount_ongoing"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="3dp"
+                                android:text="Ongoing (0)"
+                                android:textColor="@color/md_theme_onSecondaryContainer"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                tools:ignore="HardcodedText" />
 
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                            <TextView
+                                android:id="@+id/tv_timeToComplete_ongoing"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="Total time: -"
+                                android:textColor="@color/md_theme_tertiary"
+                                android:textSize="9sp"
+                                tools:ignore="HardcodedText,SmallSp" />
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cv_onhold"
-                    android:clickable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
-                    app:cardBackgroundColor="@color/md_theme_outlineVariant"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:cardElevation="3dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cv_onhold"
+                        android:clickable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        android:layout_width="135dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="20dp"
-                        android:paddingTop="20dp"
-                        android:paddingBottom="20dp">
+                        android:layout_marginHorizontal="10dp"
+                        app:cardBackgroundColor="@color/md_theme_outlineVariant"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="3dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                        <TextView
-                            android:id="@+id/tv_typeCount_onhold"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="3dp"
-                            android:text="On Hold (0)"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText" />
+                            android:orientation="vertical"
+                            android:paddingHorizontal="20dp"
+                            android:paddingTop="20dp"
+                            android:paddingBottom="20dp">
 
-                        <TextView
-                            android:id="@+id/tv_timeToComplete_onhold"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="Total time: -"
-                            android:textColor="@color/md_theme_tertiary"
-                            android:textSize="10sp"
-                            tools:ignore="HardcodedText,SmallSp" />
+                            <TextView
+                                android:id="@+id/tv_typeCount_onhold"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="3dp"
+                                android:text="On Hold (0)"
+                                android:textColor="@color/md_theme_onSecondaryContainer"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                tools:ignore="HardcodedText" />
 
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
+                            <TextView
+                                android:id="@+id/tv_timeToComplete_onhold"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="Total time: -"
+                                android:textColor="@color/md_theme_tertiary"
+                                android:textSize="9sp"
+                                tools:ignore="HardcodedText,SmallSp" />
 
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cv_pending"
-                    android:clickable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
-                    app:cardBackgroundColor="@color/md_theme_outlineVariant"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:cardElevation="3dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cv_pending"
+                        android:clickable="true"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        android:layout_width="135dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="20dp"
-                        android:paddingTop="20dp"
-                        android:paddingBottom="20dp">
+                        android:layout_marginHorizontal="10dp"
+                        app:cardBackgroundColor="@color/md_theme_outlineVariant"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        app:cardElevation="3dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                        <TextView
-                            android:id="@+id/tv_typeCount_pending"
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="3dp"
-                            android:text="Pending (0)"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            tools:ignore="HardcodedText" />
+                            android:orientation="vertical"
+                            android:paddingHorizontal="20dp"
+                            android:paddingTop="20dp"
+                            android:paddingBottom="20dp">
 
-                        <TextView
-                            android:id="@+id/tv_timeToComplete_pending"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="3dp"
-                            android:text="Total time: -"
-                            android:textColor="@color/md_theme_tertiary"
-                            android:textSize="10sp"
-                            tools:ignore="HardcodedText,SmallSp" />
+                            <TextView
+                                android:id="@+id/tv_typeCount_pending"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="3dp"
+                                android:text="Pending (0)"
+                                android:textColor="@color/md_theme_onSecondaryContainer"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                tools:ignore="HardcodedText" />
 
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-            </LinearLayout>
-        </HorizontalScrollView>
+                            <TextView
+                                android:id="@+id/tv_timeToComplete_pending"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:text="Total time: -"
+                                android:textColor="@color/md_theme_tertiary"
+                                android:textSize="9sp"
+                                tools:ignore="HardcodedText,SmallSp" />
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+            </HorizontalScrollView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/popup_menu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.drawerlayout.widget.DrawerLayout>

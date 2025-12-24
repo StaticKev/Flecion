@@ -3,21 +3,22 @@ package com.statickev.flecion.data.repository
 import com.statickev.flecion.data.dao.TaskDAO
 import com.statickev.flecion.data.model.Task
 import com.statickev.flecion.platform.scheduler.scheduleTaskReminder
+import com.statickev.flecion.util.toEpochMillis
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDateTime
 
 class TaskRepository (
     private val taskDao: TaskDAO
 ) {
-    fun getTaskById(id: Int): Flow<Task?> = taskDao.getTaskById(id)
-
-    // TODO: Modify 'getAllTasks()' function to return sorted data based on 'priorityScore'
-    fun getAllTasks(): Flow<List<Task>> = taskDao.getAllTasks()
-
     fun getPendingTasks(): Flow<List<Task>> = taskDao.getPendingTasks()
 
     fun getOnHoldTasks(): Flow<List<Task>> = taskDao.getOnHoldTasks()
 
     fun getOngoingTasks(): Flow<List<Task>> = taskDao.getOngoingTasks()
+
+    fun getTaskById(id: Int): Flow<Task?> = taskDao.getTaskById(id)
+
+    fun getTaskByDoAt(doAt: LocalDateTime) = taskDao.getTaskByDate(doAt.toEpochMillis())
 
     // TODO: Delete on production.
     suspend fun insertTasks(tasks: List<Task>) {

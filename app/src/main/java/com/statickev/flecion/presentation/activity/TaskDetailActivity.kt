@@ -247,8 +247,8 @@ class TaskDetailActivity : AppCompatActivity() {
                                 )
                             }
 
-                            if (task.addToCalendar) swAddToCalendar.visibility = View.GONE
-                            else swAddToCalendar.visibility = View.VISIBLE
+//                            if (task.addToCalendar) swAddToCalendar.visibility = View.GONE
+//                            else swAddToCalendar.visibility = View.VISIBLE
 
                             tvTitle.text = task.title
                             tvCompletionRate.text = buildString {
