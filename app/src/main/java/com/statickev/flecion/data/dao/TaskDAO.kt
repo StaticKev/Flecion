@@ -40,6 +40,7 @@ interface TaskDAO {
     @Query("SELECT * FROM tasks WHERE id = :id")
     fun getTaskById(id: Int): Flow<Task?>
 
-    @Query("SELECT * FROM tasks WHERE doAt = :dateMillis")
-    fun getTaskByDate(dateMillis: Long)
+    // Need to get the date component and compare it!
+    @Query("SELECT * FROM tasks WHERE doAt = :dateMillis ORDER BY doAt")
+    fun getTaskByDate(dateMillis: Long): Flow<List<Task>>
 }

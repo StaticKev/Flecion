@@ -58,11 +58,11 @@ class TaskAdapter(
             }
         }
 
-        holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, TaskDetailActivity::class.java)
+        holder.binding.cvTask.setOnClickListener {
+            val intent = Intent(holder.binding.cvTask.context, TaskDetailActivity::class.java)
             intent.putExtra(TASK_ID, task.id)
 
-            holder.itemView.context.startActivity(intent)
+            holder.binding.cvTask.context.startActivity(intent)
         }
     }
 

@@ -17,10 +17,6 @@
             android:checkable="true"
             android:icon="@drawable/baseline_directions_run_24" />
         <item
-            android:title="Quotes"
-            android:checkable="true"
-            android:icon="@drawable/baseline_format_quote_24" />
-        <item
             android:title="Journal"
             android:checkable="true"
             android:icon="@drawable/baseline_book_24" />
@@ -28,6 +24,10 @@
             android:title="Pomodoro Timer"
             android:checkable="true"
             android:icon="@drawable/baseline_timer_24" />
+        <item
+            android:title="Quotes"
+            android:checkable="true"
+            android:icon="@drawable/baseline_format_quote_24" />
     </group>
     <group>
         <item android:title="Apps Shortcut">

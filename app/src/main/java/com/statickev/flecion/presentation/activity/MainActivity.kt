@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity() {
             }
             ithDeleteTask.attachToRecyclerView(rvTasks)
 
-            tvDate.text = LocalDate.now().format(getDayDateFormatter())
+            btDate.text = LocalDate.now().format(getDayDateFormatter())
 
             btnMenu.setOnClickListener {
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {

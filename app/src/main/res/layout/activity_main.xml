@@ -15,7 +15,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/drawer_menu">
+        app:menu="@menu/drawer_menu"
+        app:headerLayout="@layout/layout_nav_drawer_header">
     </com.google.android.material.navigation.NavigationView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,9 +32,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/drawable_secondary_wallpaper1"
-            android:elevation="4dp"
+            android:elevation="2dp"
             android:orientation="horizontal"
-            android:translationZ="4dp"
+            android:translationZ="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -52,46 +53,34 @@
                 app:srcCompat="@drawable/baseline_menu_24"
                 tools:ignore="ContentDescription" />
 
-            <TextView
-                android:id="@+id/tv_date"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/bt_date"
+                style="@style/Widget.Material3.Button.TonalButton.Icon"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="45dp"
                 android:layout_weight="1"
-                android:gravity="center_horizontal|center_vertical"
                 android:text="Day, 00 Month 0000"
-                android:textColor="@color/md_theme_tertiary"
                 android:textSize="10sp"
-                android:textStyle="bold"
-                tools:ignore="HardcodedText,SmallSp" />
+                tools:ignore="HardcodedText,SmallSp">
+
+            </com.google.android.material.button.MaterialButton>
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/iv_profile"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/avatar"
                 android:scaleType="centerCrop"
                 app:shapeAppearanceOverlay="@style/CircleImage"
-                android:layout_marginTop="50dp"
-                android:layout_marginEnd="20dp"
+                android:layout_marginTop="55dp"
+                android:layout_marginEnd="25dp"
                 android:layout_marginBottom="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
-
-<!--            <ImageButton-->
-<!--                android:id="@+id/btn_calendar"-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:layout_marginTop="50dp"-->
-<!--                android:layout_marginEnd="20dp"-->
-<!--                android:layout_marginBottom="20dp"-->
-<!--                android:background="?attr/selectableItemBackgroundBorderless"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent"-->
-<!--                app:srcCompat="@drawable/baseline_calendar_month_24"-->
-<!--                tools:ignore="ContentDescription" />-->
 
         </LinearLayout>
 
@@ -102,8 +91,8 @@
             android:elevation="0dp"
             android:overScrollMode="never"
             android:paddingHorizontal="15dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="85dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="87dp"
             app:layout_constraintBottom_toTopOf="@+id/popup_menu"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -132,9 +121,9 @@
             android:layout_height="0dp"
             android:layout_gravity="bottom"
             android:background="@drawable/drawable_secondary_wallpaper2"
-            android:elevation="4dp"
+            android:elevation="2dp"
             android:orientation="vertical"
-            android:translationZ="4dp"
+            android:translationZ="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
@@ -168,7 +157,7 @@
                         android:layout_marginHorizontal="10dp"
                         app:cardBackgroundColor="@color/md_theme_outlineVariant"
                         app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="3dp"
+                        app:cardElevation="1dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -215,7 +204,7 @@
                         android:layout_marginHorizontal="10dp"
                         app:cardBackgroundColor="@color/md_theme_outlineVariant"
                         app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="3dp"
+                        app:cardElevation="1dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -262,7 +251,7 @@
                         android:layout_marginHorizontal="10dp"
                         app:cardBackgroundColor="@color/md_theme_outlineVariant"
                         app:cardCornerRadius="@dimen/card_corner_radius"
-                        app:cardElevation="3dp"
+                        app:cardElevation="1dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
