@@ -2,7 +2,6 @@ package com.statickev.flecion.data.repository
 
 import com.statickev.flecion.data.dao.TaskDAO
 import com.statickev.flecion.data.model.Task
-import com.statickev.flecion.platform.scheduler.scheduleTaskReminder
 import com.statickev.flecion.util.toEpochMillis
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
@@ -19,6 +18,8 @@ class TaskRepository (
     fun getTaskById(id: Int): Flow<Task?> = taskDao.getTaskById(id)
 
     fun getTaskByDoAt(doAt: LocalDateTime) = taskDao.getTaskByDate(doAt.toEpochMillis())
+
+    fun getScheduledTasks() = taskDao.getScheduledTasks()
 
     // TODO: Delete on production.
     suspend fun insertTasks(tasks: List<Task>) {

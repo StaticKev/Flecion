@@ -8,7 +8,6 @@ import androidx.room.Query
 import androidx.room.Update
 import com.statickev.flecion.data.model.Task
 import kotlinx.coroutines.flow.Flow
-import java.sql.Timestamp
 
 // TODO: Create a function to delete tasks if it's not within this week.
 // TODO: Create a function to return the number of completed tasks this week.
@@ -40,7 +39,10 @@ interface TaskDAO {
     @Query("SELECT * FROM tasks WHERE id = :id")
     fun getTaskById(id: Int): Flow<Task?>
 
-    // Need to get the date component and compare it!
+    // TODO: The date component is required for comparison!
     @Query("SELECT * FROM tasks WHERE doAt = :dateMillis ORDER BY doAt")
     fun getTaskByDate(dateMillis: Long): Flow<List<Task>>
+
+    @Query("SELECT * FROM tasks WHERE doAt IS NOT NULL")
+    fun getScheduledTasks(): List<Task>
 }

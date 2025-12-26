@@ -56,7 +56,7 @@ class NewTaskActivity : AppCompatActivity() {
             swAddToCalendar.visibility = View.GONE
 
             btnBack.setOnClickListener {
-                MaterialAlertDialogBuilder(baseContext)
+                MaterialAlertDialogBuilder(this@NewTaskActivity)
                     .setTitle("Confirm")
                     .setMessage("Go back and discard your changes?")
                     .setPositiveButton("Yes") { _, _ ->

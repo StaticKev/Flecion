@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.statickev.flecion.data.repository.TaskRepository
 import com.statickev.flecion.data.model.Task
+import com.statickev.flecion.data.repository.TaskRepository
 import com.statickev.flecion.platform.scheduler.cancelTaskReminder
 import com.statickev.flecion.platform.scheduler.scheduleTaskReminder
 import com.statickev.flecion.util.toEpochMillis
@@ -20,31 +20,30 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TaskViewModel @Inject constructor (
-    private val taskRepo: TaskRepository,
+class TaskViewModel @Inject constructor(
+    private val repo: TaskRepository,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
-    val pendingTaskState = taskRepo.getPendingTasks()
+    val pendingTaskState = repo.getPendingTasks()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyList()
         )
 
-    val onHoldTaskState = taskRepo.getOnHoldTasks()
+    val onHoldTaskState = repo.getOnHoldTasks()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyList()
         )
 
-    val ongoingTaskState = taskRepo.getOngoingTasks()
+    val ongoingTaskState = repo.getOngoingTasks()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyList()
         )
-
 
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
@@ -52,13 +51,13 @@ class TaskViewModel @Inject constructor (
     // TODO: Delete on production.
     fun addTasks(task: List<Task>) {
         viewModelScope.launch {
-            taskRepo.insertTasks(task)
+            repo.insertTasks(task)
         }
     }
 
     fun addTask(task: Task) {
         viewModelScope.launch {
-            taskRepo.insertTask(task)
+            repo.insertTask(task)
             @SuppressLint("ScheduleExactAlarm")
             task.remindAt?.let { remindAt ->
                 scheduleTaskReminder(
@@ -73,7 +72,7 @@ class TaskViewModel @Inject constructor (
 
     fun deleteTask(task: Task) {
         viewModelScope.launch {
-            taskRepo.deleteTask(task)
+            repo.deleteTask(task)
             cancelTaskReminder(appContext, task.id)
             _uiEvent.emit(UiEvent.ShowSnackbarOnDelete("Task deleted", task))
         }
@@ -81,6 +80,5 @@ class TaskViewModel @Inject constructor (
 
     sealed class UiEvent {
         data class ShowSnackbarOnDelete(val message: String, val deletedTask: Task) : UiEvent()
-//        data class ShowSnackBarOnCategoryChange()
     }
 }
