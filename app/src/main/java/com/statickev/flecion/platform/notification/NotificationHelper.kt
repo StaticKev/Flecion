@@ -6,7 +6,13 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import androidx.core.app.NotificationCompat
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.statickev.flecion.R
+import com.statickev.flecion.platform.scheduler.TASK_ID
+import com.statickev.flecion.platform.worker.TaskReminderWorker
 
 fun createNotificationChannel(context: Context) {
     val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
@@ -30,12 +36,12 @@ fun createNotificationChannel(context: Context) {
     manager.createNotificationChannel(channel)
 }
 
-object NotificationHelper {
-    fun showNotification(context: Context, message: String) {
+object TaskScheduler {
+    fun showNotification(context: Context, title: String) {
         val notification = NotificationCompat.Builder(context, "task_reminder")
-            .setSmallIcon(R.drawable.baseline_notifications_none_24) // TODO: Change this with app icon later!
-            .setContentTitle("\uD83D\uDD14 You've got a task to do!")
-            .setContentText(message)
+            .setSmallIcon(R.drawable.baseline_notifications_none_24)
+            .setContentTitle("🔔 You've got a task to do!")
+            .setContentText(title)
             .setAutoCancel(true)
             .build()
 
@@ -43,5 +49,20 @@ object NotificationHelper {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         manager.notify(System.currentTimeMillis().toInt(), notification)
+    }
+
+    fun enqueueReminderWorker(context: Context, taskId: Long) {
+        val workRequest = OneTimeWorkRequestBuilder<TaskReminderWorker>()
+            .setInputData(
+                workDataOf(TASK_ID to taskId)
+            )
+            .build()
+
+        WorkManager.getInstance(context)
+            .enqueueUniqueWork(
+                "task_reminder_worker_$taskId",
+                ExistingWorkPolicy.REPLACE,
+                workRequest
+            )
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.statickev.flecion.data.model.Task
+import com.statickev.flecion.data.model.TaskStatus
 import com.statickev.flecion.data.repository.TaskRepository
 import com.statickev.flecion.platform.scheduler.cancelTaskReminder
 import com.statickev.flecion.platform.scheduler.scheduleTaskReminder
@@ -14,6 +15,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -24,21 +26,22 @@ class TaskViewModel @Inject constructor(
     private val repo: TaskRepository,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
-    val pendingTaskState = repo.getPendingTasks()
+
+    val pendingTaskState = repo.getTaskByStatus(TaskStatus.PENDING)
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyList()
         )
 
-    val onHoldTaskState = repo.getOnHoldTasks()
+    val onHoldTaskState = repo.getTaskByStatus(TaskStatus.ON_HOLD)
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyList()
         )
 
-    val ongoingTaskState = repo.getOngoingTasks()
+    val ongoingTaskState = repo.getTaskByStatus(TaskStatus.ONGOING)
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -58,15 +61,17 @@ class TaskViewModel @Inject constructor(
     fun addTask(task: Task) {
         viewModelScope.launch {
             repo.insertTask(task)
-            @SuppressLint("ScheduleExactAlarm")
-            task.remindAt?.let { remindAt ->
-                scheduleTaskReminder(
-                    context = appContext,
-                    taskId = task.id,
-                    taskTitle = task.title,
-                    triggerAtMillis = remindAt.toEpochMillis()
-                )
-            }
+            try {
+                task.remindAt?.let { remindAt ->
+                    scheduleTaskReminder(
+                        context = appContext,
+                        taskId = task.id,
+                        taskTitle = task.title,
+                        triggerAtMillis = remindAt.toEpochMillis(),
+                        isRecurring = task.recurInterval != null
+                    )
+                }
+            } catch (e: SecurityException) {}
         }
     }
 

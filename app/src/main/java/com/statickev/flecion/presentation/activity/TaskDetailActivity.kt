@@ -1,14 +1,10 @@
 package com.statickev.flecion.presentation.activity
 
-import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Lifecycle
@@ -36,12 +32,10 @@ class TaskDetailActivity : AppCompatActivity() {
     private val viewModel: TaskDetailViewModel by viewModels {
         defaultViewModelProviderFactory
     }
-
+    private lateinit var binding: ActivityTaskDetailBinding
     private var isSet = false
     private var isReverted = false
-    private lateinit var binding: ActivityTaskDetailBinding
 
-    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         generalSetup(this)
@@ -64,7 +58,6 @@ class TaskDetailActivity : AppCompatActivity() {
         }
 
         with (binding) {
-
             btnBack.setOnClickListener {
                 if (viewModel.isFormValid) finish()
                 else {
@@ -200,6 +193,15 @@ class TaskDetailActivity : AppCompatActivity() {
                 }
             }
 
+            swAddToCalendar.setOnClickListener {
+                viewModel.onAddToCalendarChanged(swAddToCalendar.isChecked)
+                // TODO: Remove when the feature is implemented.
+                Toast.makeText(
+                    root.context,
+                    "This feature is under development!",
+                    Toast.LENGTH_SHORT).show()
+            }
+
             etDescription.doOnTextChanged { text, _, _, _ ->
                 viewModel.onDescriptionChanged(text.toString())
             }
@@ -247,18 +249,18 @@ class TaskDetailActivity : AppCompatActivity() {
                                 )
                             }
 
-//                            if (task.addToCalendar) swAddToCalendar.visibility = View.GONE
-//                            else swAddToCalendar.visibility = View.VISIBLE
-
                             tvTitle.text = task.title
                             tvCompletionRate.text = buildString {
                                 append(task.completionRate.toString())
                                 append("%")
                             }
-                            sdCompletionRate.value = task.completionRate.toFloat()
+                            sdCompletionRate.value = (task.completionRate?.toFloat() ?: 0.0) as Float
                             tvTimeToComplete.text = minsToFormattedDuration(task.timeLeftToComplete)
                             tvPriorityLevel.text = task.priorityLevel.toString()
                             swAddToCalendar.isChecked = task.addToCalendar
+
+                            if (task.doAt == null) swAddToCalendar.visibility = View.GONE
+                            else swAddToCalendar.visibility = View.VISIBLE
 
                             if (!isSet || isReverted) {
                                 task.remindAt?.let { remindAt ->
@@ -270,6 +272,7 @@ class TaskDetailActivity : AppCompatActivity() {
                                 task.doAt?.let { doAt ->
                                     etDoAt.setText(getFormattedDateTime(doAt))
                                 }
+                                swAddToCalendar.isChecked = task.addToCalendar
                                 task.description?.let { description ->
                                     etDescription.setText(description)
                                 }

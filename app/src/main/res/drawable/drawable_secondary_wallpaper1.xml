@@ -5,8 +5,8 @@
     <solid android:color="@color/md_theme_surfaceContainerLowest" />
 
     <corners
-        android:bottomLeftRadius="20dp"
-        android:bottomRightRadius="20dp"
+        android:bottomLeftRadius="16dp"
+        android:bottomRightRadius="16dp"
         android:topLeftRadius="0dp"
         android:topRightRadius="0dp" />
 </shape>

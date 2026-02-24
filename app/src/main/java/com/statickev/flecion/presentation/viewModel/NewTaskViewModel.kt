@@ -1,9 +1,6 @@
 package com.statickev.flecion.presentation.viewModel
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -37,12 +34,15 @@ class NewTaskViewModel @Inject constructor (
     val timeToCompleteHoursError: LiveData<String?> = _timeToCompleteHoursError
     private val _timeToCompleteMinsError = MutableLiveData<String?>(null)
     val timeToCompleteMinsError: LiveData<String?> = _timeToCompleteMinsError
+    private val _recurIntervalError = MutableLiveData<String?>(null)
+    val recurIntervalError: LiveData<String?> = _recurIntervalError
     private val _remindAtError = MutableLiveData<String?>(null)
     val remindAtError: LiveData<String?> = _remindAtError
     val _dueError = MutableLiveData<String?>(null)
     val dueError: LiveData<String?> = _dueError
     private val _doAtError = MutableLiveData<String?>(null)
     val doAtError: LiveData<String?> = _doAtError
+
     private val _isFormValid = MutableLiveData(true)
     val isFormValid: LiveData<Boolean> = _isFormValid
     private val _onTaskAdded = MutableLiveData<Boolean>()
@@ -99,10 +99,32 @@ class NewTaskViewModel @Inject constructor (
 
     fun onStatusChanged(value: TaskStatus) {
         _newTask.status = value
+
+        _remindAtError.value = remindAtIsValid(
+            _newTask.status,
+            _newTask.remindAt,
+            _newTask.due,
+            _newTask.doAt
+        )
+
+        validate()
     }
 
-    fun onPriorityLevelChanged(value: Float) {
-        _newTask.priorityLevel = value.toInt().toByte()
+    fun onPriorityLevelChanged(value: Float?) {
+        _newTask.priorityLevel = value?.toInt()?.toByte()
+    }
+
+    fun onRecurIntervalChanged(value: String?) {
+        if (value.isNullOrBlank()) {
+            _newTask.recurInterval = null
+            _recurIntervalError.value = "Required"
+        }
+        else {
+            _newTask.recurInterval = value?.toInt()
+            _recurIntervalError.value = null
+        }
+
+        validate()
     }
 
     fun onRemindAtChanged(value: String?) {
@@ -110,9 +132,12 @@ class NewTaskViewModel @Inject constructor (
             LocalDateTime.parse(it, getDateTimeFormatter())
         }
 
-        _remindAtError.value = _newTask.remindAt?.let {
-            remindAtIsValid(it, _newTask.due, _newTask.doAt)
-        }
+        _remindAtError.value = remindAtIsValid(
+            _newTask.status,
+            _newTask.remindAt,
+            _newTask.due,
+            _newTask.doAt
+        )
 
         validate()
     }
@@ -122,9 +147,12 @@ class NewTaskViewModel @Inject constructor (
             LocalDateTime.parse(it, getDateTimeFormatter())
         }
 
-        _remindAtError.value = _newTask.remindAt?.let {
-            remindAtIsValid(it, _newTask.due, _newTask.doAt)
-        }
+        _remindAtError.value = remindAtIsValid(
+            _newTask.status,
+            _newTask.remindAt,
+            _newTask.due,
+            _newTask.doAt
+        )
         _dueError.value = _newTask.due?.let {
             dueIsValid(it)
         }
@@ -139,10 +167,14 @@ class NewTaskViewModel @Inject constructor (
         _newTask.doAt = value?.takeIf { it.isNotEmpty() }?.let {
             LocalDateTime.parse(it, getDateTimeFormatter())
         }
+        if (_newTask.doAt == null) _newTask.addToCalendar = false
 
-        _remindAtError.value = _newTask.remindAt?.let {
-            remindAtIsValid(it, _newTask.due, _newTask.doAt)
-        }
+        _remindAtError.value = remindAtIsValid(
+            _newTask.status,
+            _newTask.remindAt,
+            _newTask.due,
+            _newTask.doAt
+        )
         _doAtError.value = _newTask.doAt?.let {
             doAtIsValid(_newTask.due, it)
         }
@@ -154,9 +186,14 @@ class NewTaskViewModel @Inject constructor (
         _newTask.addToCalendar = value
     }
 
+    fun onSendNotificationChanged(value: Boolean) {
+        _newTask.sendNotification = value
+    }
+
     private fun validate() {
         _isFormValid.value = timeToCompleteHoursError.value == null &&
                 timeToCompleteMinsError.value == null &&
+                recurIntervalError.value == null &&
                 remindAtError.value == null &&
                 dueError.value == null &&
                 doAtError.value == null
@@ -166,14 +203,18 @@ class NewTaskViewModel @Inject constructor (
         viewModelScope.launch {
             val taskId = taskRepo.insertTask(_newTask)
 
-            @SuppressLint("ScheduleExactAlarm")
-            _newTask.remindAt?.let { remindAt ->
-                scheduleTaskReminder(
-                    context = appContext,
-                    taskId = taskId,
-                    taskTitle = _newTask.title,
-                    triggerAtMillis = remindAt.toEpochMillis()
-                )
+            if (_newTask.sendNotification) {
+                try {
+                    _newTask.remindAt?.let { remindAt ->
+                        scheduleTaskReminder(
+                            context = appContext,
+                            taskId = taskId,
+                            taskTitle = _newTask.title,
+                            triggerAtMillis = remindAt.toEpochMillis(),
+                            isRecurring = _newTask.recurInterval != null
+                        )
+                    }
+                } catch (e: SecurityException) {}
             }
 
             _onTaskAdded.postValue(true)

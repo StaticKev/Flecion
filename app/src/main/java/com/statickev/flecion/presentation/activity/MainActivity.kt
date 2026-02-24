@@ -10,13 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
 import com.statickev.flecion.R
 import com.statickev.flecion.databinding.ActivityMainBinding
-import com.statickev.flecion.presentation.fragments.AlarmFragment
-import com.statickev.flecion.presentation.fragments.HabitTrackerFragment
 import com.statickev.flecion.presentation.fragments.JournalFragment
-import com.statickev.flecion.presentation.fragments.PomodoroTimerFragment
+import com.statickev.flecion.presentation.fragments.FinanceFragment
 import com.statickev.flecion.presentation.fragments.RecurringTasksFragment
 import com.statickev.flecion.presentation.fragments.TaskFragment
 import com.statickev.flecion.presentation.presentationUtil.generalSetup
@@ -28,7 +25,6 @@ import java.time.LocalDate
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var navController: NavController
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (!isGranted) {
@@ -60,10 +56,8 @@ class MainActivity : AppCompatActivity() {
                 when (menuItem.itemId) {
                     R.id.nav_my_tasks -> { navigateToFragment(TaskFragment()) }
                     R.id.nav_recurring -> { navigateToFragment(RecurringTasksFragment()) }
-                    R.id.nav_alarm -> { navigateToFragment(AlarmFragment()) }
-                    R.id.nav_habit -> { navigateToFragment(HabitTrackerFragment()) }
                     R.id.nav_journal -> { navigateToFragment(JournalFragment()) }
-                    R.id.nav_pomodoro -> { navigateToFragment(PomodoroTimerFragment()) }
+                    R.id.nav_finance -> { navigateToFragment(FinanceFragment()) }
                 }
 
                 if (menuItem.isCheckable) menuItem.isChecked = true

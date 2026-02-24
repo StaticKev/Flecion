@@ -1,21 +1,22 @@
 package com.statickev.flecion.presentation.fragments
 
-import androidx.fragment.app.viewModels
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import com.statickev.flecion.R
-import com.statickev.flecion.presentation.viewModel.AlarmViewModel
+import com.statickev.flecion.presentation.viewModel.FinanceViewModel
+import kotlin.getValue
 
-class AlarmFragment : Fragment() {
+class FinanceFragment : Fragment() {
 
     companion object {
-        fun newInstance() = AlarmFragment()
+        fun newInstance() = FinanceFragment()
     }
 
-    private val viewModel: AlarmViewModel by viewModels()
+    private val viewModel: FinanceViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +28,6 @@ class AlarmFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return inflater.inflate(R.layout.fragment_alarm, container, false)
+        return inflater.inflate(R.layout.fragment_finance, container, false)
     }
 }

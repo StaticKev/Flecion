@@ -7,14 +7,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.statickev.flecion.data.model.Task
-import com.statickev.flecion.data.model.TaskStatus
 import com.statickev.flecion.data.repository.TaskRepository
 import com.statickev.flecion.platform.scheduler.cancelTaskReminder
 import com.statickev.flecion.platform.scheduler.scheduleTaskReminder
 import com.statickev.flecion.presentation.adapter.TaskAdapter.Companion.TASK_ID
-import com.statickev.flecion.presentation.presentationUtil.doAtIsValid
-import com.statickev.flecion.presentation.presentationUtil.dueIsValid
-import com.statickev.flecion.presentation.presentationUtil.remindAtIsValid
 import com.statickev.flecion.util.getDateTimeFormatter
 import com.statickev.flecion.util.toEpochMillis
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +26,7 @@ import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
-class TaskDetailViewModel @Inject constructor(
+class RecurringTaskDetailViewModel @Inject constructor(
     private val repo: TaskRepository,
     savedStateHandle: SavedStateHandle,
     @ApplicationContext private val appContext: Context
@@ -48,17 +44,24 @@ class TaskDetailViewModel @Inject constructor(
             if (initialTask == null) field = value
         }
 
+    private val _recurIntervalError = MutableLiveData<String?>(null)
+    val recurIntervalError: LiveData<String?> = _recurIntervalError
     private val _remindAtError = MutableLiveData<String?>(null)
     val remindAtError: LiveData<String?> = _remindAtError
-    private val _dueError = MutableLiveData<String?>(null)
-    val dueError: LiveData<String?> = _dueError
-    private val _doAtError = MutableLiveData<String?>(null)
-    val doAtError: LiveData<String?> = _doAtError
+    private val _recurIntervalFlow = MutableSharedFlow<Task>(extraBufferCapacity = 1)
     private val _descriptionFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
     var isFormValid = true
         private set
 
     init {
+        viewModelScope.launch {
+            _recurIntervalFlow
+                .debounce(500)
+                .collect { updatedRecurIntervalTask ->
+                    val current = task.value ?: return@collect
+                    repo.updateTask(updatedRecurIntervalTask)
+                }
+        }
         viewModelScope.launch {
             _descriptionFlow
                 .debounce(500)
@@ -69,30 +72,16 @@ class TaskDetailViewModel @Inject constructor(
         }
     }
 
-    fun onStatusChanged(value: TaskStatus) {
-        viewModelScope.launch {
-            task.value?.let {
-                repo.updateTask(
-                    it.copy(
-                        status = value
-                    )
-                )
-            }
+    fun onRecurIntervalChanged(value: String) {
+        task.value?.let {
+            val updatedTask = it.copy(recurInterval = value.toIntOrNull())
+
+            _recurIntervalFlow.tryEmit(updatedTask)
+            validate(updatedTask)
         }
     }
 
-    fun onPriorityLevelChanged(value: Float) {
-        viewModelScope.launch {
-            task.value?.let {
-                repo.updateTask(
-                    it.copy(
-                        completionRate = value.toInt()
-                    )
-                )
-            }
-        }
-    }
-
+    // TODO: If RemindAt is empty, cancel notification.
     fun onRemindAtChanged(value: String?) {
         viewModelScope.launch {
             task.value?.let { it ->
@@ -120,57 +109,25 @@ class TaskDetailViewModel @Inject constructor(
         }
     }
 
-    fun onDueChanged(value: String?) {
+    fun onSendNotificationChanged(value: Boolean) {
         viewModelScope.launch {
             task.value?.let { it ->
                 val updatedTask = it.copy(
-                    due = value?.takeIf { it.isNotEmpty() }?.let {
-                        LocalDateTime.parse(it, getDateTimeFormatter())
-                    }
+                    sendNotification = value
                 )
 
                 repo.updateTask(updatedTask)
 
-                validate(updatedTask)
-            }
-        }
-    }
-
-    // TODO: If DoAt is empty, remove event from calendar.
-    fun onDoAtChanged(value: String?) {
-        viewModelScope.launch {
-            task.value?.let { it ->
-                var updatedTask: Task
-                if (!value.isNullOrBlank()) {
-                    updatedTask = it.copy(
-                        doAt = value?.takeIf { it.isNotEmpty() }?.let {
-                            LocalDateTime.parse(it, getDateTimeFormatter())
-                        }
+                try {
+                    if (updatedTask.sendNotification) scheduleTaskReminder(
+                        context = appContext,
+                        taskId = updatedTask.id,
+                        taskTitle = updatedTask.title,
+                        triggerAtMillis = updatedTask.remindAt!!.toEpochMillis(),
+                        isRecurring = updatedTask.recurInterval != null
                     )
-                }
-                else {
-                    updatedTask = it.copy(doAt = null, addToCalendar = false)
-                    // TODO: Remove event from calendar
-                }
-
-                repo.updateTask(updatedTask)
-
-                validate(updatedTask)
-            }
-        }
-    }
-
-    // TODO: Implement onAddToCalendarChanged later.
-    fun onAddToCalendarChanged(value: Boolean) {
-        viewModelScope.launch {
-            task.value?.let { it ->
-                val updatedTask = it.copy(
-                    addToCalendar = value
-                )
-
-                repo.updateTask(updatedTask)
-
-                // Add or remove event from calendar.
+                    else cancelTaskReminder(appContext, updatedTask.id)
+                } catch (e: SecurityException) {}
             }
         }
     }
@@ -180,24 +137,21 @@ class TaskDetailViewModel @Inject constructor(
     }
 
     fun validate(updatedTask: Task) {
-        _remindAtError.value = updatedTask.remindAt?.let { ut ->
-            remindAtIsValid(
-                updatedTask.status,
-                ut,
-                updatedTask.due,
-                updatedTask.doAt
-            )
-        }
-        _dueError.value = updatedTask.due?.let { ut ->
-            dueIsValid(ut)
-        }
-        _doAtError.value = updatedTask.doAt?.let { ut ->
-            doAtIsValid(updatedTask.due, ut )
+        if (updatedTask.recurInterval == null) _recurIntervalError.value = "Required"
+        else _recurIntervalError.value = null
+
+        val remindAt = updatedTask.remindAt
+
+        _remindAtError.value = when {
+            remindAt == null -> "Required!"
+
+            remindAt.isBefore(LocalDateTime.now()) -> "Value must be later than now!"
+
+            else -> null
         }
 
-        isFormValid = _remindAtError.value == null
-                && _dueError.value == null
-                && _doAtError.value == null
+        isFormValid = _recurIntervalError.value == null &&
+                _remindAtError.value == null
     }
 
     fun revertChanges(partial: Boolean) {
@@ -206,22 +160,15 @@ class TaskDetailViewModel @Inject constructor(
 
             task.value?.let { it ->
                 if (partial) {
-                    val rcDoAt = when {
-                        doAtError.value == null -> it.doAt
-                        else -> initialTask?.doAt
-                    }
-
                     updatedTask = it.copy(
                         remindAt = when {
                             remindAtError.value == null -> it.remindAt
                             else -> initialTask?.remindAt
                         },
-                        due = when {
-                            dueError.value == null -> it.due
-                            else -> initialTask?.due
-                        },
-                        doAt = rcDoAt,
-                        addToCalendar = rcDoAt != null
+                        recurInterval = when {
+                            recurIntervalError.value == null -> it.recurInterval
+                            else -> initialTask?.recurInterval
+                        }
                     )
 
                     repo.updateTask(updatedTask)

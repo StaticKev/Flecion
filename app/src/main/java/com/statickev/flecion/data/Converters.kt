@@ -1,10 +1,8 @@
 package com.statickev.flecion.data
 
 import androidx.room.TypeConverter
-import com.statickev.flecion.data.model.DueStatus
 import com.statickev.flecion.data.model.TaskStatus
 import java.time.Instant
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 

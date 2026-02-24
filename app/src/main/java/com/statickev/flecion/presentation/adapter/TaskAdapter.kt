@@ -14,7 +14,7 @@ import com.statickev.flecion.util.getDateFormatter
 import com.statickev.flecion.util.minsToFormattedDuration
 
 class TaskAdapter(
-    private var tasks: List<Task>
+    private var tasks: List<Task> = emptyList()
 ): RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     companion object {
@@ -50,8 +50,15 @@ class TaskAdapter(
                 append(" left")
             }
 
-            tvDueDate.text = task.due?.toLocalDate()?.format(getDateFormatter()) ?: ""
-            pbProgress.progress = task.completionRate
+            if (task.due == null) {
+                tvDueDate.visibility = View.INVISIBLE
+            }
+            else {
+                task.due?.let {
+                    tvDueDate.text = it.toLocalDate()?.format(getDateFormatter())
+                }
+            }
+            pbProgress.progress = task.completionRate ?: 0
             tvProgressPercentage.text = buildString {
                 append(task.completionRate.toString())
                 append("%")

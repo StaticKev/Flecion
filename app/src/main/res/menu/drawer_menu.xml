@@ -17,28 +17,16 @@
             android:icon="@drawable/baseline_loop_24" />
 
         <item
-            android:id="@+id/nav_alarm"
-            android:title="Alarm"
-            android:checkable="true"
-            android:icon="@drawable/baseline_alarm_24" />
-
-        <item
-            android:id="@+id/nav_habit"
-            android:title="Habit Tracker"
-            android:checkable="true"
-            android:icon="@drawable/baseline_directions_run_24" />
-
-        <item
             android:id="@+id/nav_journal"
             android:title="Journal"
             android:checkable="true"
             android:icon="@drawable/baseline_book_24" />
 
         <item
-            android:id="@+id/nav_pomodoro"
-            android:title="Pomodoro Timer"
+            android:id="@+id/nav_finance"
+            android:title="Finance"
             android:checkable="true"
-            android:icon="@drawable/baseline_timer_24" />
+            android:icon="@drawable/baseline_attach_money_24" />
     </group>
 
     <group>

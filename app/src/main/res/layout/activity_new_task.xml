@@ -11,25 +11,26 @@
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:elevation="8dp"
+        android:elevation="2dp"
         android:background="@drawable/drawable_secondary_wallpaper1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_back"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="50dp"
             android:layout_marginBottom="20dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_arrow_back_24"
-            tools:ignore="ContentDescription" />
+            app:icon="@drawable/baseline_arrow_back_24"
+            app:iconSize="24dp"
+            app:iconGravity="textStart"
+            style="@style/Widget.Material3.Button.IconButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -37,7 +38,8 @@
         android:id="@+id/constraintLayout2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:elevation="8dp"
+        android:elevation="2dp"
+        android:translationZ="10dp"
         android:background="@drawable/drawable_secondary_wallpaper2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -92,7 +94,7 @@
                 android:inputType="textMultiLine"
                 android:textColor="@color/md_theme_onBackground"
                 android:textColorHighlight="@color/md_theme_inversePrimary_highContrast"
-                android:textColorHint="@color/md_theme_onBackground"
+                android:textColorHint="@color/md_theme_outline"
                 android:textSize="26sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -170,7 +172,86 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Frequency"
+                android:textColor="@color/md_theme_onBackground"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.067"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+                tools:ignore="HardcodedText" />
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/tg_frequency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/rdb_one_time"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="-4dp"
+                    android:text="One-time"
+                    app:cornerRadius="5dp"
+                    app:iconGravity="textStart"
+                    tools:ignore="HardcodedText" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/rdb_recurring"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:elevation="-4dp"
+                    android:text="Recurring"
+                    app:cornerRadius="5dp"
+                    app:iconGravity="textStart"
+                    tools:ignore="HardcodedText" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <TextView
+                android:id="@+id/tv_recur_interval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Recur Interval"
+                android:textColor="@color/md_theme_onBackground"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.067"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+                tools:ignore="HardcodedText" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_recur_interval"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                tools:ignore="RtlSymmetry">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_recur_interval"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:elevation="-4dp"
+                    android:hint="Days"
+                    android:inputType="numberSigned"
+                    tools:ignore="HardcodedText" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/tv_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -236,7 +317,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textView6"
+                    android:id="@+id/tv_priority_level_label"
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -287,6 +368,16 @@
                     android:hint="Remind At"
                     android:paddingStart="45dp" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <Switch
+                android:id="@+id/sw_send_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Send Notification"
+                android:textColor="@color/md_theme_onBackground"
+                tools:ignore="HardcodedText,UseSwitchCompatOrMaterialXml" />
+
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_due"

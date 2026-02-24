@@ -18,7 +18,7 @@
         android:overScrollMode="never"
         android:paddingHorizontal="15dp"
         android:paddingTop="8dp"
-        android:paddingBottom="87dp"
+        android:paddingBottom="85dp"
         app:layout_constraintBottom_toTopOf="@+id/popup_menu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -219,8 +219,8 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <FrameLayout
-        android:id="@+id/fl_container"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fc_weekly_calendar"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/popup_menu"
@@ -228,6 +228,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </FrameLayout>
+    </androidx.fragment.app.FragmentContainerView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

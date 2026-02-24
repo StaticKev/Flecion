@@ -14,52 +14,56 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/drawable_secondary_wallpaper1"
-        android:elevation="8dp"
+        android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_back"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="50dp"
             android:layout_marginBottom="20dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_arrow_back_24"
-            tools:ignore="ContentDescription" />
+            app:icon="@drawable/baseline_arrow_back_24"
+            app:iconSize="24dp"
+            app:iconGravity="textStart"
+            style="@style/Widget.Material3.Button.IconButton" />
 
-        <ImageButton
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_delete"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginTop="50dp"
             android:layout_marginEnd="20dp"
+            android:layout_marginTop="50dp"
             android:layout_marginBottom="20dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_delete_24"
-            tools:ignore="ContentDescription" />
+            app:icon="@drawable/baseline_delete_24"
+            app:iconSize="24dp"
+            app:iconGravity="textStart"
+            style="@style/Widget.Material3.Button.IconButton" />
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_undo"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginTop="50dp"
             android:layout_marginBottom="20dp"
-            android:layout_marginEnd="10dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_delete"
+            app:layout_constraintEnd_toStartOf="@id/btn_delete"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/baseline_undo_24"
-            tools:ignore="ContentDescription" />
+            app:icon="@drawable/baseline_undo_24"
+            app:iconSize="24dp"
+            app:iconGravity="textStart"
+            style="@style/Widget.Material3.Button.IconButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -75,13 +79,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginHorizontal="20dp"
             android:orientation="vertical"
             android:paddingHorizontal="10dp"
             android:paddingTop="28dp"
             android:paddingBottom="64dp">
-
 
             <TextView
                 android:id="@+id/tv_title"

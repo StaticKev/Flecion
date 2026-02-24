@@ -3,7 +3,6 @@ package com.statickev.flecion.data.model
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Entity(tableName = "tasks")
@@ -13,65 +12,55 @@ data class Task(
     var title: String = "New Task",
     var description: String? = "",
     var status: TaskStatus = TaskStatus.PENDING,
-    var priorityLevel: Byte = 1,
+    var priorityLevel: Byte? = 1,
     var timeToCompleteMins: Int = 0,
-    var completionRate: Int = 0,
+    var completionRate: Int? = 0,
     var remindAt: LocalDateTime? = null,
     var due: LocalDateTime? = null,
     var doAt: LocalDateTime? = null,
     var addToCalendar: Boolean = false,
-    var googleEventId: String? = null
+    var googleEventId: String? = null,
+    var sendNotification: Boolean = true,
+    var recurInterval: Int? = null,
 ) {
     @get:Ignore
     val timeLeftToComplete: Int
-        get() = timeToCompleteMins - (
-                timeToCompleteMins * completionRate / 100
-                )
-    @get:Ignore
-    val isOverdue: DueStatus
-        get() = when {
-            due == null -> DueStatus.NO_DUE
-            due!!.isEqual(LocalDateTime.now()) -> DueStatus.DUE_TODAY
-            due!!.isBefore(LocalDateTime.now()) -> DueStatus.OVERDUE
-            else -> DueStatus.UPCOMING
-        }
+        get() = completionRate?.let {
+            timeToCompleteMins - (timeToCompleteMins * it / 100)
+        } ?: 0
+
     @get:Ignore
     val priorityScore: Int
         get() {
-            val daysToDue = due?.let {
-                java.time.Duration.between(LocalDateTime.now(), it)
-                    .toDays().coerceAtLeast(0)
-            } ?: 365
+            return priorityLevel?.let { it ->
+                val daysToDue = due?.let {
+                    java.time.Duration.between(LocalDateTime.now(), it)
+                        .toDays().coerceAtLeast(0)
+                } ?: 365
 
-            val daysToDoAt = doAt?.let {
-                java.time.Duration.between(LocalDateTime.now(), it)
-                    .toDays().coerceAtLeast(0)
-            } ?: 365
+                val daysToDoAt = doAt?.let {
+                    java.time.Duration.between(LocalDateTime.now(), it)
+                        .toDays().coerceAtLeast(0)
+                } ?: 365
 
-            val normalizedPriorityLevel = priorityLevel / 5.0
-            val normalizedTimeLeft = timeLeftToComplete / 432059.0
-            val normalizedDaysToDue = 1 - (daysToDue / 365.0)
-            val normalizedDaysToDoAt = 1 - (daysToDoAt / 365.0)
+                val normalizedPriorityLevel = it / 5.0
+                val normalizedTimeLeft = timeLeftToComplete / 432059.0
+                val normalizedDaysToDue = 1 - (daysToDue / 365.0)
+                val normalizedDaysToDoAt = 1 - (daysToDoAt / 365.0)
 
-            val rawScore =
-                normalizedPriorityLevel * 0.5 +
-                        normalizedTimeLeft * 0.2 +
-                        normalizedDaysToDue * 0.2 +
-                        normalizedDaysToDoAt * 0.1
+                val rawScore = (normalizedPriorityLevel * 0.5) +
+                        (normalizedTimeLeft * 0.2) +
+                        (normalizedDaysToDue * 0.2) +
+                        (normalizedDaysToDoAt * 0.1)
 
-            return (rawScore * 1000).toInt().coerceAtLeast(1)
+                (rawScore * 1000).toInt().coerceAtLeast(1)
+            } ?: 0
         }
 }
 
 enum class TaskStatus {
     ONGOING,
     ON_HOLD,
-    PENDING
-}
-
-enum class DueStatus {
-    UPCOMING,
-    DUE_TODAY,
-    OVERDUE,
-    NO_DUE
+    PENDING,
+    ON_REPEAT
 }

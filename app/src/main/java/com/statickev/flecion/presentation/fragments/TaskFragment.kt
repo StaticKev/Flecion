@@ -4,6 +4,7 @@ import android.app.Activity.RESULT_OK
 import android.content.Intent
 import androidx.fragment.app.viewModels
 import android.os.Bundle
+import android.text.TextUtils.replace
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -25,6 +27,7 @@ import com.statickev.flecion.data.model.Task
 import com.statickev.flecion.data.model.TaskStatus
 import com.statickev.flecion.databinding.FragmentTaskBinding
 import com.statickev.flecion.presentation.activity.NewTaskActivity
+import com.statickev.flecion.presentation.activity.NewTaskActivity.Companion.IS_RECURRING
 import com.statickev.flecion.presentation.adapter.TaskAdapter
 import com.statickev.flecion.presentation.presentationUtil.showSnackbar
 import com.statickev.flecion.presentation.presentationUtil.showUndoSnackbar
@@ -79,10 +82,6 @@ class TaskFragment : Fragment() {
             }
         }
     )
-
-    companion object {
-        fun newInstance() = TaskFragment()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,11 +143,31 @@ class TaskFragment : Fragment() {
                     )
                 )
             }
+
+            repeat(6) { i ->
+                add(
+                    Task(
+                        title = "Recurring Task ${i + 1}",
+                        timeToCompleteMins = 120 + i * 20,
+                        description = "Currently being worked on #${i + 1}",
+                        status = TaskStatus.ON_REPEAT,
+                        remindAt = LocalDateTime.now().plusHours((i + 1).toLong()),
+                        sendNotification = i % 3 == 0,
+                        recurInterval = i
+                    )
+                )
+            }
         } // TODO: Delete on production.
         viewModel.addTasks(sampleTasks) // TODO: Delete on production.
 
         with (binding) {
-            taskAdapter = TaskAdapter(emptyList())
+            // TODO: Load the WeeklyCalendarFragment
+            childFragmentManager.commit {
+                setReorderingAllowed(true)
+                replace(binding.fcWeeklyCalendar.id, WeeklyCalendarFragment())
+            }
+
+            taskAdapter = TaskAdapter()
             rvTasks.adapter = taskAdapter
             rvTasks.layoutManager = LinearLayoutManager(this.root.context)
 
@@ -190,7 +209,7 @@ class TaskFragment : Fragment() {
                         .setInterpolator(AccelerateInterpolator())
                         .start()
 
-                    flContainer.animate()
+                    fcWeeklyCalendar.animate()
                         .translationY(0f)
                         .setDuration(animateDuration)
                         .setInterpolator(AccelerateInterpolator())
@@ -263,8 +282,8 @@ class TaskFragment : Fragment() {
                         .setInterpolator(DecelerateInterpolator())
                         .start()
 
-                    flContainer.animate()
-                        .translationY(-flContainer.height.toFloat())
+                    fcWeeklyCalendar.animate()
+                        .translationY(-fcWeeklyCalendar.height.toFloat())
                         .setDuration(animateDuration)
                         .setInterpolator(AccelerateInterpolator())
                         .start()
@@ -306,7 +325,7 @@ class TaskFragment : Fragment() {
                         .setInterpolator(AccelerateInterpolator())
                         .start()
 
-                    flContainer.animate()
+                    fcWeeklyCalendar.animate()
                         .translationY(0f)
                         .setDuration(animateDuration)
                         .setInterpolator(AccelerateInterpolator())
@@ -381,8 +400,8 @@ class TaskFragment : Fragment() {
                         .setInterpolator(DecelerateInterpolator())
                         .start()
 
-                    flContainer.animate()
-                        .translationY(-flContainer.height.toFloat())
+                    fcWeeklyCalendar.animate()
+                        .translationY(-fcWeeklyCalendar.height.toFloat())
                         .setDuration(animateDuration)
                         .setInterpolator(AccelerateInterpolator())
                         .start()
@@ -424,7 +443,7 @@ class TaskFragment : Fragment() {
                         .setInterpolator(AccelerateInterpolator())
                         .start()
 
-                    flContainer.animate()
+                    fcWeeklyCalendar.animate()
                         .translationY(0f)
                         .setDuration(animateDuration)
                         .setInterpolator(AccelerateInterpolator())
@@ -494,8 +513,8 @@ class TaskFragment : Fragment() {
                         .setInterpolator(DecelerateInterpolator())
                         .start()
 
-                    flContainer.animate()
-                        .translationY(-flContainer.height.toFloat())
+                    fcWeeklyCalendar.animate()
+                        .translationY(-fcWeeklyCalendar.height.toFloat())
                         .setDuration(animateDuration)
                         .setInterpolator(AccelerateInterpolator())
                         .start()
@@ -506,6 +525,7 @@ class TaskFragment : Fragment() {
 
             fabAdd.setOnClickListener {
                 val intent = Intent(this.root.context, NewTaskActivity::class.java)
+                intent.putExtra(IS_RECURRING, false)
                 addTaskLauncher.launch(intent)
             }
 
